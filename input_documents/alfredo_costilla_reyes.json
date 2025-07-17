@@ -1,0 +1,95 @@
+{
+    "person": {
+      "id": 1,
+      "name": "Alfredo Costilla-Reyes",
+      "summary": "Biographical and professional information for Alfredo Costilla-Reyes.",
+      "links": [
+        {
+          "id": 101,
+          "summary": "Alfredo Costilla-Reyes' faculty profile page at the University of California, Davis (BME Department).",
+          "url": "https://bme.ucdavis.edu/people/alfredo-costilla-reyes",
+          "type": "faculty_profile"
+        },
+        {
+          "id": 102,
+          "summary": "National Science Foundation (NSF) award information for Alfredo Costilla-Reyes (Award ID: 2136679).",
+          "url": "https://www.nsf.gov/awardsearch/showAward?AWD_ID=2136679&HistoricalAwards=false",
+          "type": "nsf_award"
+        },
+        {
+          "id": 103,
+          "summary": "National Science Foundation (NSF) award information for Alfredo Costilla-Reyes (Award ID: 2335642).",
+          "url": "https://www.nsf.gov/awardsearch/showAward?AWD_ID=2335642&HistoricalAwards=false",
+          "type": "nsf_award"
+        },
+        {
+          "id": 104,
+          "summary": "Texas A&M Engineering news article announcing Alfredo Costilla-Reyes receiving Mexico's highest student award.",
+          "url": "https://engineering.tamu.edu/news/2017/11/costilla-reyes-awarded-mexicos-highest-student-award.html",
+          "type": "news_article",
+          "tags": ["award", "mexico", "student_award"]
+        },
+        {
+          "id": 105,
+          "summary": "Texas A&M Engineering news article naming Alfredo Costilla-Reyes as a Kirchner Food Fellow.",
+          "url": "https://engineering.tamu.edu/news/2017/08/costilla-reyes-named-kirchner-food-fellow.html",
+          "type": "news_article",
+          "tags": ["fellowship", "food_security"]
+        },
+        {
+          "id": 106,
+          "summary": "Alfredo Costilla-Reyes' Google Scholar profile, showcasing academic publications and citations.",
+          "url": "https://scholar.google.com/citations?user=mJRid9kAAAAJ&hl=en",
+          "type": "academic_profile",
+          "platform": "Google Scholar"
+        }
+      ],
+      "biographical_information": {
+        "education": [
+          {
+            "degree": "Ph.D.",
+            "field": "Electrical and Computer Engineering",
+            "institution": "Texas A&M University"
+          }
+        ],
+        "awards": [
+          {
+            "name": "Mexico's Highest Innovation Award",
+            "year": 2017,
+            "source": "Texas A&M Engineering News"
+          },
+          {
+            "name": "Kirchner Food Fellow",
+            "year": 2017,
+            "source": "Texas A&M Engineering News"
+          }
+        ],
+        "current_affiliation": {
+          "institution": "University of California, Davis",
+          "department": "Biomedical Engineering"
+        },
+        "research_interests": [
+          "Biomedical Engineering",
+          "Wearable Sensors",
+          "Wearable Devices",
+          "Electrical Engineering",
+          "VLSI",
+          "Remote Sensing",
+          "Remote Asset Monitoring",
+          "Microcontrollers",
+          "Microelectronics",
+          "Time-series data analysis",
+          "Edge Computing",
+          "Machine Learning",
+          "Data Science",
+          "Printed Circuit Boards",
+          "Entrepreneurship",
+          "Technology Transfer",
+          "Computer Science",
+          "Embedded Systems",
+          "Edge Computing",
+          "Healthcare"
+        ]
+      }
+    }
+  }

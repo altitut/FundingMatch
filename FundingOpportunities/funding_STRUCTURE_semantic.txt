@@ -1,0 +1,134 @@
+Of course. Here is a list of all the fields in the provided JSON structure, broken down by their main sections.
+
+### **`basic_info`**
+
+* `title`
+* `program_id`
+* `nsf_program_number`
+* `status`
+* `type`
+* `posted_date`
+
+---
+### **`opportunity_details`**
+
+* `synopsis`
+* `award_types`
+* `due_dates`
+* `accepts_anytime`
+* `key_requirements`
+
+---
+### **`categorization`**
+
+* `research_areas`
+* `funding_categories`
+* `opportunity_level`
+
+---
+### **`urls`**
+
+* `program_url`
+* `solicitation_url`
+
+---
+### **`metadata`**
+
+* `word_count`
+* `has_detailed_synopsis`
+* `processing_timestamp`
+
+---
+### **`semantic_analysis`**
+
+* `error`
+* `skipped_reason`
+* `enhanced_description`
+* `analysis_confidence`
+* `confidence_score`
+* `analysis_timestamp`
+* `opportunity_id`
+* `opportunity_title`
+* `enhanced_opportunity_profile`
+    * `confidence_score`
+    * `refined_title_and_program_focus`
+        * `refined_title`
+        * `program_focus`
+    * `comprehensive_description`
+    * `target_audience_and_eligibility`
+        * `target_audience`
+        * `eligibility_requirements`
+            * `organizations`
+            * `principal_investigators`
+    * `award_information`
+        * `award_types`
+        * `award_amounts`
+            * `total_program_funding`
+            * `individual_award_size`
+            * `estimated_number_of_awards`
+        * `award_duration`
+    * `submission_requirements`
+        * `deadline`
+        * `submission_process`
+        * `pre-submission_artifacts`
+            * `letter_of_intent_required`
+            * `preliminary_proposal_required`
+* `technical_focus_areas`
+    * `confidence_score`
+    * `primary_research_domains`
+    * `specific_technical_priorities`
+        * `priority`
+        * `description`
+    * `innovation_expectations`
+    * `technology_readiness_levels`
+    * `interdisciplinary_collaboration_opportunities`
+* `strategic_context`
+    * `confidence_score`
+    * `nsf_directorate_and_program_positioning`
+    * `relationship_to_national_priorities`
+    * `partnership_opportunities_and_requirements`
+    * `international_collaboration_aspects`
+    * `industry_engagement_expectations`
+* `competitive_landscape`
+    * `confidence_score`
+    * `funding_competition_level`
+    * `typical_award_amounts_and_project_scales`
+    * `review_criteria_and_evaluation_process`
+    * `previous_award_examples_and_patterns`
+    * `strategic_positioning_recommendations`
+* `application_strategy`
+    * `confidence_score`
+    * `key_proposal_elements`
+    * `critical_success_factors`
+    * `common_pitfalls_to_avoid`
+    * `timeline_and_preparation_recommendations`
+    * `team_composition_and_collaboration_needs`
+* `semantic_keywords`
+    * `confidence_score`
+    * `technical_terminology`
+    * `research_methodology_keywords`
+    * `application_domain_keywords`
+    * `innovation_and_impact_keywords`
+    * `collaboration_and_partnership_keywords`
+* `match_ready_summary`
+    * `confidence_score`
+    * `summary`
+    * `key_capabilities_needed`
+    * `innovation_potential_and_impact`
+        * `innovation`
+        * `impact`
+    * `collaboration_requirements`
+    * `funding_readiness_indicators`
+
+---
+### **`processing_metadata`**
+
+* `processed_date`
+* `skipped`
+* `skip_reason`
+* `program_url_accessible`
+* `solicitation_url_accessible`
+* `gemini_model`
+* `analysis_time_seconds`
+* `program_url_processed`
+* `solicitation_url_processed`

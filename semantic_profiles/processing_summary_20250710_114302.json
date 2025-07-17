@@ -1,0 +1,14 @@
+{
+  "processing_date": "2025-07-10T11:43:02.718450",
+  "output_directory": "semantic_profiles",
+  "total_documents_found": 41,
+  "total_urls_found": 6,
+  "total_items_found": 47,
+  "items_to_process": 47,
+  "successfully_processed": 47,
+  "processing_rate": "47/47",
+  "incremental_processing": true,
+  "api_used": "Gemini 2.5 Pro",
+  "processing_mode": "REAL_AI_ANALYSIS",
+  "semantic_profile_file": "semantic_profiles/alfredo_costilla_reyes_COMPREHENSIVE_semantic_profile_20250710_114302.json"
+}
