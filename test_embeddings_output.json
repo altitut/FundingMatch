@@ -1,0 +1,50 @@
+[
+  {
+    "opportunity": {
+      "id": "nsf_0",
+      "title": "National Science Foundation Translation to Practice (NSF TTP)",
+      "description": "The U.S. NSF Directorate for Technology, Innovation and Partnerships (NSF TIP) partners across sectors to advance three primary focus areas \u2013 accelerating technology translation and development, fostering regional innovation and economic growth, and preparing the American workforce for future high-wage jobs in STEM fields.\nThe translation of research to practice ensures that the insights and innovations developed through scientific study and experimentation have tangible, positive impacts for th",
+      "agency": "NSF"
+    },
+    "embedding_length": 768,
+    "embedding_sample": [
+      0.014529167,
+      0.039623857,
+      -0.024785377,
+      0.047681756,
+      0.0029175272
+    ]
+  },
+  {
+    "opportunity": {
+      "id": "nsf_1",
+      "title": "Verticals-enabling Intelligent Network Systems (VINES)",
+      "description": "The VINES program seeks to support both fundamental research and verticals-driven technology development, demonstration, and translation activities that will lead to leaps in performance and capabilities of next generation (NextG) advanced intelligent network systems that span the user-edge-core-cloud continuum. The program seeks to go beyond the current research portfolios within individual participating NSF directorates and partner organizations by simultaneously emphasizing gains in performan",
+      "agency": "NSF"
+    },
+    "embedding_length": 768,
+    "embedding_sample": [
+      -0.0018509723,
+      0.0059850155,
+      -0.004479241,
+      0.044476036,
+      -0.003944955
+    ]
+  },
+  {
+    "opportunity": {
+      "id": "nsf_2",
+      "title": "Education and Broadening Participation in Earth Sciences (EAR EBP)",
+      "description": "The Division of Earth Sciences' Education and Broadening Participation Program (EBP) facilitates activities that engage a wide range of audiences in Earth Sciences research efforts, which are:\n1)\u00a0Research Experiences for Undergraduates and Teachers: This program provides funding to academic institutions that allows them\u00a0to offer summer internships to undergraduate\u00a0students and opportunities for teachers who would like to participate in earth sciences\u00a0related research efforts.\u00a0\u00a02)\u00a0EAR Postdoctora",
+      "agency": "NSF"
+    },
+    "embedding_length": 768,
+    "embedding_sample": [
+      0.022364816,
+      -0.028049646,
+      -0.07679826,
+      0.019152753,
+      0.035493903
+    ]
+  }
+]

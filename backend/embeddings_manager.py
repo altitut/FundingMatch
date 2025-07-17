@@ -24,7 +24,7 @@ class GeminiEmbeddingsManager:
             raise ValueError("GEMINI_API_KEY not found in environment variables")
         
         self.client = genai.Client(api_key=api_key)
-        self.model = 'gemini-embedding-001'  # Embedding model
+        self.model = 'models/text-embedding-004'  # Latest embedding model from Google AI
         
     def generate_embedding(self, text: str, task_type: str = "RETRIEVAL_DOCUMENT") -> List[float]:
         """
@@ -38,11 +38,17 @@ class GeminiEmbeddingsManager:
             List of embedding values
         """
         try:
-            response = self.client.models.embed(
+            # Using the embed_content method from google-genai
+            # Note: contents parameter expects a list
+            response = self.client.models.embed_content(
                 model=self.model,
-                content=text
+                contents=[text]  # Contents must be a list
             )
-            return response.embeddings[0].values
+            # Extract the embedding values
+            if hasattr(response, 'embeddings') and response.embeddings:
+                return list(response.embeddings[0].values)
+            else:
+                raise ValueError("No embedding returned in response")
         except Exception as e:
             print(f"Error generating embedding: {e}")
             raise

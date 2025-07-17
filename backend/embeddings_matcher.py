@@ -11,8 +11,8 @@ from datetime import datetime
 import numpy as np
 from tqdm import tqdm
 
-from embeddings_manager import GeminiEmbeddingsManager
-from vector_database import VectorDatabaseManager
+from .embeddings_manager import GeminiEmbeddingsManager
+from .vector_database import VectorDatabaseManager
 from google import genai
 from dotenv import load_dotenv
 
