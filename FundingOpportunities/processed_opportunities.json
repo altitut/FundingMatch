@@ -1,0 +1,30 @@
+{
+  "opportunities": {
+    "97965a6ce1c9cb1b29864641920afa43": {
+      "title": "National Science Foundation Translation to Practice (NSF TTP)",
+      "processed_date": "2025-07-17T17:26:18.124609",
+      "expiration_date": null
+    },
+    "5c4330fd9dc62f8a7429040188f71480": {
+      "title": "Verticals-enabling Intelligent Network Systems (VINES)",
+      "processed_date": "2025-07-17T17:26:19.146310",
+      "expiration_date": null
+    },
+    "23351a66905b0967d2b206c31a415916": {
+      "title": "Education and Broadening Participation in Earth Sciences (EAR EBP)",
+      "processed_date": "2025-07-17T17:26:20.167936",
+      "expiration_date": null
+    },
+    "ec10fa88af9a97c4b85bab69ebaf4974": {
+      "title": "The Research on Research Security Program (RoRS)",
+      "processed_date": "2025-07-17T17:26:21.087875",
+      "expiration_date": null
+    },
+    "98c4f57d345a229dea7169af6c6c93bc": {
+      "title": "Incorporating Human Behavior in Epidemiological Models (IHBEM)",
+      "processed_date": "2025-07-17T17:26:21.962399",
+      "expiration_date": null
+    }
+  },
+  "last_cleanup": null
+}

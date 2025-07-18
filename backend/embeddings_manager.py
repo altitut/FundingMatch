@@ -169,15 +169,32 @@ class GeminiEmbeddingsManager:
         if 'agency' in opportunity:
             sections.append(f"Agency: {opportunity['agency']}")
         if 'description' in opportunity:
-            sections.append(f"Description: {opportunity['description'][:500]}")  # Limit length
+            sections.append(f"Description: {opportunity['description'][:1000]}")  # Increased limit
             
         # Technical details
         if 'topics' in opportunity:
             sections.append(f"Topics: {', '.join(opportunity['topics'])}")
         if 'keywords' in opportunity:
-            sections.append(f"Keywords: {', '.join(opportunity['keywords'])}")
+            if isinstance(opportunity['keywords'], list):
+                sections.append(f"Keywords: {', '.join(opportunity['keywords'])}")
+            else:
+                sections.append(f"Keywords: {opportunity['keywords']}")
         if 'eligibility' in opportunity:
             sections.append(f"Eligibility: {opportunity['eligibility'][:200]}")
+            
+        # URL enriched content
+        if 'url_content' in opportunity:
+            url_content = opportunity['url_content']
+            if url_content.get('main_content'):
+                sections.append(f"Content: {url_content['main_content'][:500]}")
+            if url_content.get('keywords'):
+                sections.append(f"Additional keywords: {', '.join(url_content['keywords'][:10])}")
+                
+        # Enriched fields
+        if 'eligibility_enriched' in opportunity:
+            sections.append(f"Eligibility details: {opportunity['eligibility_enriched'][:300]}")
+        if 'award_info_enriched' in opportunity:
+            sections.append(f"Award information: {opportunity['award_info_enriched'][:200]}")
             
         # Semantic analysis if available
         if 'semantic_analysis' in opportunity:
