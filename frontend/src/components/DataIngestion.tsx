@@ -1,13 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, CheckCircle, AlertCircle, Database } from 'lucide-react';
+import { Upload, CheckCircle, AlertCircle, Database, ExternalLink, Calendar } from 'lucide-react';
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = 'http://localhost:5001/api';
 
 interface Stats {
   opportunities?: number;
   researchers?: number;
   proposals?: number;
+}
+
+interface ProgressInfo {
+  status: string;
+  stage?: string;
+  message?: string;
+  current?: number;
+  total?: number;
+  summary?: any;
+  error?: string;
+}
+
+interface Opportunity {
+  id: string;
+  title: string;
+  agency: string;
+  deadline: string;
+  url: string;
+  topic_number?: string;
+}
+
+interface UnprocessedOpportunity {
+  title: string;
+  agency: string;
+  reason: string;
 }
 
 const DataIngestion: React.FC = () => {
@@ -19,9 +44,14 @@ const DataIngestion: React.FC = () => {
   });
   const [stats, setStats] = useState<Stats>({});
   const [isDragging, setIsDragging] = useState(false);
+  const [progress, setProgress] = useState<ProgressInfo | null>(null);
+  const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
+  const [unprocessedOpportunities, setUnprocessedOpportunities] = useState<UnprocessedOpportunity[]>([]);
+  const [activeTab, setActiveTab] = useState<'processed' | 'unprocessed'>('processed');
 
   useEffect(() => {
     fetchStats();
+    fetchOpportunities();
   }, []);
 
   const fetchStats = async () => {
@@ -32,6 +62,17 @@ const DataIngestion: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to fetch stats:', error);
+    }
+  };
+
+  const fetchOpportunities = async () => {
+    try {
+      const response = await axios.get(`${API_BASE}/opportunities`);
+      if (response.data.success) {
+        setOpportunities(response.data.opportunities);
+      }
+    } catch (error) {
+      console.error('Failed to fetch opportunities:', error);
     }
   };
 
@@ -84,6 +125,7 @@ const DataIngestion: React.FC = () => {
 
     setUploading(true);
     setMessage({ type: null, text: '' });
+    setProgress(null);
 
     const formData = new FormData();
     formData.append('file', file);
@@ -96,22 +138,67 @@ const DataIngestion: React.FC = () => {
       });
 
       if (response.data.success) {
-        setMessage({
-          type: 'success',
-          text: `Successfully processed ${response.data.filename}. ${response.data.message}`,
-        });
-        setFile(null);
-        // Refresh stats
-        fetchStats();
+        // Start listening to progress updates
+        const sessionId = response.data.session_id;
+        const eventSource = new EventSource(`${API_BASE}/ingest/progress/${sessionId}`);
+        
+        eventSource.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          
+          if (data.keepalive) {
+            // Ignore keepalive messages
+            return;
+          }
+          
+          setProgress(data);
+          
+          // Log debug messages to console
+          if (data.stage === 'debug') {
+            console.log('Debug:', data.message);
+          }
+          
+          if (data.status === 'complete') {
+            const summary = data.summary;
+            setMessage({
+              type: 'success',
+              text: `Successfully processed ${summary.filename}. Added ${summary.new_opportunities} new opportunities, skipped ${summary.duplicate_skipped} duplicates and ${summary.expired_skipped} expired.`,
+            });
+            setFile(null);
+            setProgress(null);
+            setUploading(false);
+            // Set unprocessed opportunities
+            if (summary.unprocessed && summary.unprocessed.length > 0) {
+              setUnprocessedOpportunities(summary.unprocessed);
+              setActiveTab('unprocessed');
+            }
+            // Refresh stats and opportunities
+            fetchStats();
+            fetchOpportunities();
+            eventSource.close();
+          } else if (data.status === 'error') {
+            setMessage({ type: 'error', text: data.error || 'Processing failed' });
+            setProgress(null);
+            setUploading(false);
+            eventSource.close();
+          }
+        };
+        
+        eventSource.onerror = (error) => {
+          console.error('SSE Error:', error);
+          setMessage({ type: 'error', text: 'Lost connection to server' });
+          setProgress(null);
+          setUploading(false);
+          eventSource.close();
+        };
       } else {
         setMessage({ type: 'error', text: response.data.error || 'Upload failed' });
+        setUploading(false);
       }
     } catch (error) {
       setMessage({
         type: 'error',
         text: 'Failed to upload file. Please ensure the server is running.',
       });
-    } finally {
       setUploading(false);
     }
   };
@@ -211,6 +298,29 @@ const DataIngestion: React.FC = () => {
             </div>
           )}
 
+          {progress && progress.status === 'processing' && (
+            <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-blue-900">
+                  {progress.message || 'Processing...'}
+                </span>
+                {progress.current && progress.total && (
+                  <span className="text-sm text-blue-700">
+                    {progress.current} / {progress.total}
+                  </span>
+                )}
+              </div>
+              {progress.current && progress.total && (
+                <div className="w-full bg-blue-200 rounded-full h-2">
+                  <div
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${(progress.current / progress.total) * 100}%` }}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
           {message.text && (
             <div
               className={`mt-4 p-4 rounded-lg flex items-start ${
@@ -255,6 +365,152 @@ const DataIngestion: React.FC = () => {
           <li>• Expired opportunities are automatically removed</li>
         </ul>
       </div>
+
+      {/* Opportunities Table */}
+      {(opportunities.length > 0 || unprocessedOpportunities.length > 0) && (
+        <div className="bg-white rounded-lg shadow">
+          <div className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Funding Opportunities</h3>
+            
+            {/* Tabs */}
+            <div className="border-b border-gray-200 mb-4">
+              <nav className="-mb-px flex space-x-8">
+                <button
+                  onClick={() => setActiveTab('processed')}
+                  className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                    activeTab === 'processed'
+                      ? 'border-indigo-500 text-indigo-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  Processed ({opportunities.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab('unprocessed')}
+                  className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                    activeTab === 'unprocessed'
+                      ? 'border-indigo-500 text-indigo-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  Unprocessed ({unprocessedOpportunities.length})
+                </button>
+              </nav>
+            </div>
+            
+            <div className="overflow-x-auto">
+              {activeTab === 'processed' ? (
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        #
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        ID
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Title
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Agency
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Deadline
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        URL
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {opportunities.map((opp, index) => (
+                      <tr key={opp.id}>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                          {index + 1}
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                          {opp.topic_number || opp.id.substring(0, 8)}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-900">
+                          <div className="max-w-xs truncate" title={opp.title}>
+                            {opp.title}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                          {opp.agency}
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                          <div className="flex items-center">
+                            <Calendar className="h-4 w-4 mr-1" />
+                            {opp.deadline || 'Not specified'}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                          {opp.url ? (
+                            <a
+                              href={opp.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-indigo-600 hover:text-indigo-900 flex items-center"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </a>
+                          ) : (
+                            '-'
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        #
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Title
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Agency
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Reason Not Processed
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {unprocessedOpportunities.map((opp, index) => (
+                      <tr key={index}>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                          {index + 1}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-900">
+                          <div className="max-w-xs truncate" title={opp.title}>
+                            {opp.title}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                          {opp.agency}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-500">
+                          <div className="flex items-center">
+                            <AlertCircle className="h-4 w-4 mr-2 text-yellow-500" />
+                            {opp.reason}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

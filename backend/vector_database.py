@@ -24,17 +24,36 @@ class VectorDatabaseManager:
         """
         self.persist_directory = persist_directory
         
-        # Create ChromaDB client with persistence
-        self.client = chromadb.PersistentClient(
-            path=persist_directory,
-            settings=Settings(
-                anonymized_telemetry=False,
-                allow_reset=True
+        try:
+            # Create ChromaDB client with persistence
+            self.client = chromadb.PersistentClient(
+                path=persist_directory,
+                settings=Settings(
+                    anonymized_telemetry=False,
+                    allow_reset=True
+                )
             )
-        )
-        
-        # Initialize collections
-        self._init_collections()
+            
+            # Initialize collections
+            self._init_collections()
+        except Exception as e:
+            print(f"Error initializing ChromaDB: {e}")
+            print("Attempting to recreate database...")
+            
+            # Remove old database and retry
+            import shutil
+            if os.path.exists(persist_directory):
+                shutil.rmtree(persist_directory)
+            
+            # Try again with fresh database
+            self.client = chromadb.PersistentClient(
+                path=persist_directory,
+                settings=Settings(
+                    anonymized_telemetry=False,
+                    allow_reset=True
+                )
+            )
+            self._init_collections()
         
     def _init_collections(self):
         """Initialize or get existing collections"""
@@ -314,7 +333,8 @@ class VectorDatabaseManager:
                                 'agency': doc.get('agency', metadata.get('agency', 'Unknown')),
                                 'url': doc.get('url', doc.get('solicitation_url', doc.get('sbir_topic_link', ''))),
                                 'description': (doc.get('description', '')[:200] + '...') if doc.get('description') else '',
-                                'deadline': doc.get('close_date', doc.get('deadline', metadata.get('deadline', '')))
+                                'deadline': doc.get('close_date', doc.get('deadline', metadata.get('deadline', ''))),
+                                'topic_number': doc.get('topic_number', doc.get('Topic Number', ''))
                             })
                         except:
                             # Fallback to metadata only

@@ -329,16 +329,30 @@ def update_profile():
         
         # Update the URLs in the profile
         if urls:
-            existing_links = profile.get('links', [])
+            existing_links = profile.get('urls', [])
             for url in urls:
                 if url and not any(link['url'] == url for link in existing_links):
                     existing_links.append({"url": url, "type": "web"})
-            profile['links'] = existing_links
+            profile['urls'] = existing_links
         
         # Store updated profile
         success = user_manager.store_user_profile(profile)
         
         if success:
+            # Update the JSON file to include all URLs
+            try:
+                with open(json_file, 'r') as f:
+                    json_data = json.load(f)
+                
+                # Update links in JSON data
+                json_data.setdefault('person', {})['links'] = profile.get('urls', [])
+                
+                # Save updated JSON
+                with open(json_file, 'w') as f:
+                    json.dump(json_data, f, indent=2)
+            except Exception as e:
+                print(f"Warning: Could not update JSON file with URLs: {e}")
+            
             return jsonify({
                 'success': True,
                 'message': 'Profile updated successfully',
@@ -548,6 +562,27 @@ def create_profile():
         success = user_manager.store_user_profile(profile)
         
         if success:
+            # Update the JSON file to include all URLs (from both JSON and manual input)
+            try:
+                with open(json_file, 'r') as f:
+                    json_data = json.load(f)
+                
+                # Update links in JSON data
+                existing_urls = [link['url'] for link in json_data.get('person', {}).get('links', [])]
+                for url in urls:
+                    if url and url not in existing_urls:
+                        json_data.setdefault('person', {}).setdefault('links', []).append({
+                            'url': url,
+                            'type': 'web',
+                            'status': 'processed'
+                        })
+                
+                # Save updated JSON
+                with open(json_file, 'w') as f:
+                    json.dump(json_data, f, indent=2)
+            except Exception as e:
+                print(f"Warning: Could not update JSON file with URLs: {e}")
+            
             # Save profile summary
             profile_summary = {
                 'id': profile['id'],

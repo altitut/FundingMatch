@@ -1,269 +1,194 @@
-# FundingMatch - AI-Powered Funding Opportunity Matching System
+# FundingMatch
+
+An AI-powered funding opportunity matching system that helps researchers find relevant grants and funding opportunities based on their research profiles.
 
 ## Overview
 
-FundingMatch is an intelligent system that matches researchers with relevant funding opportunities using advanced embeddings and AI-powered explanations. It processes funding opportunity data from CSV files, creates semantic embeddings, matches them with user profiles extracted from PDFs and structured data, and provides detailed explanations using Google's Gemini AI.
+FundingMatch uses Google's Gemini AI and vector embeddings to match researcher profiles with funding opportunities from various government sources including NSF, SBIR, SAM.gov, and Grants.gov. The system analyzes research papers, CVs, and online profiles to create comprehensive researcher profiles and matches them with relevant funding opportunities.
 
 ## Features
 
-- **Semantic Matching**: Uses Google Gemini embeddings to match researchers with funding opportunities based on semantic similarity
-- **Multi-source Profile Creation**: Extracts user information from PDFs, JSON files, and URLs
-- **RAG-Powered Explanations**: Provides detailed explanations for why opportunities match, identifies reusable content, and suggests next steps
-- **Automated Processing**: Tracks processed opportunities, removes expired ones, and enriches data with URL content
-- **Comprehensive Reporting**: Generates detailed matching reports with confidence scores
+- **AI-Powered Matching**: Uses Gemini embeddings and vector similarity search for accurate matching
+- **Multi-Source Data Ingestion**: 
+  - PDF documents (CVs, research papers, proposals)
+  - JSON profiles with bulk URL processing
+  - Web content from faculty pages, Google Scholar, etc.
+- **Real-Time Progress Tracking**: Server-sent events for live updates during processing
+- **Duplicate Detection**: Smart deduplication of funding opportunities
+- **RAG-Enhanced Explanations**: AI-generated explanations for why opportunities match
+- **Modern Web Interface**: React-based frontend with Tailwind CSS
 
-## System Requirements
+## Architecture
 
+### Backend (Python/Flask)
+- `app.py`: Main Flask application server
+- `backend/embeddings_manager.py`: Gemini embeddings API integration
+- `backend/vector_database.py`: ChromaDB vector storage
+- `backend/funding_opportunities_manager.py`: CSV processing and opportunity management
+- `backend/user_profile_manager.py`: User profile creation and management
+- `backend/url_content_fetcher.py`: Web scraping for profile enrichment
+- `backend/pdf_extractor.py`: PDF text extraction and analysis
+
+### Frontend (React/TypeScript)
+- `frontend/src/components/DataIngestion.tsx`: CSV upload and opportunity management
+- `frontend/src/components/UserProfile.tsx`: User profile creation and editing
+- `frontend/src/components/Matching.tsx`: Funding opportunity matching interface
+
+## Setup
+
+### Prerequisites
 - Python 3.8+
+- Node.js 16+
 - Google Gemini API key
-- ChromaDB for vector storage
-- Internet connection for URL content fetching
+- (Optional) SAM.gov and Grants.gov API keys
 
-## Installation
+### Installation
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/altitut/FundingMatch.git
 cd FundingMatch
 ```
 
-2. Install dependencies:
+2. Create a `.env` file with your API keys:
+```env
+GEMINI_API_KEY=your_gemini_api_key
+SAM_GOV_API_KEY=your_sam_gov_api_key
+GRANTS_GOV_API_KEY=your_grants_gov_api_key
+```
+
+3. Install dependencies and start the application:
 ```bash
-pip install -r requirements.txt
+./start_app.sh
 ```
 
-3. Set up environment variables in `.env`:
-```bash
-GEMINI_API_KEY=your_gemini_api_key_here
-```
+This will:
+- Create a Python virtual environment
+- Install Python dependencies
+- Install frontend dependencies
+- Start both backend (port 5001) and frontend (port 3000)
 
-## Project Structure
+## Usage
 
-```
-FundingMatch/
-├── backend/                      # Core functionality modules
-│   ├── embeddings_manager.py     # Gemini embeddings generation
-│   ├── vector_database.py        # ChromaDB vector storage
-│   ├── funding_opportunities_manager.py  # CSV processing & tracking
-│   ├── user_profile_manager.py   # User profile creation
-│   ├── pdf_extractor.py          # PDF text extraction
-│   ├── url_content_fetcher.py    # URL content extraction
-│   └── rag_explainer.py          # RAG explanation generation
-├── FundingOpportunities/         # Input CSV files
-│   └── Ingested/                 # Processed CSV files
-├── input_documents/              # User documents
-│   ├── *.pdf                     # User PDFs (CV, papers, etc.)
-│   └── *.json                    # User profile JSON
-├── output_results/               # Generated reports
-├── chroma_db/                    # Vector database storage
-└── release_notes/                # Documentation archive
-```
+### 1. Data Ingestion
+Navigate to the Data Ingestion tab to upload CSV files containing funding opportunities. The system will:
+- Process opportunities and generate embeddings
+- Detect and skip duplicates
+- Extract deadlines and enrich with URL content
+- Display processed and unprocessed opportunities
 
-## How It Works
+### 2. User Profile Creation
+In the User Profile tab:
+- Enter your name and research interests
+- Upload PDF documents (CV, papers, proposals)
+- Add URLs to your online profiles
+- Or upload a JSON file for bulk URL processing
 
-### Step 1: Process Funding Opportunities
-
-```bash
-python process_csv_to_embeddings.py
-```
-
-This script:
-- Scans `FundingOpportunities/` folder for CSV files
-- Extracts funding opportunity data
-- Fetches additional content from URLs in the CSV
-- Generates embeddings using Gemini API
-- Stores in ChromaDB vector database
-- Moves processed files to `Ingested/` folder
-- Tracks processed opportunities to avoid duplicates
-
-**Input**: CSV files in `FundingOpportunities/` with columns:
-- `title`: Opportunity title
-- `description`: Detailed description
-- `url`: Link to full details
-- `agency`: Funding agency
-- `keywords`: Relevant keywords
-- `close_date`, `due_date`, or `deadline`: Expiration date
-
-**Output**: Embeddings stored in ChromaDB
-
-### Step 2: Create User Profile
-
-```bash
-python create_user_profile.py
-```
-
-This script:
-- Reads user JSON file from `input_documents/`
-- Extracts text from PDF documents (CV, papers, proposals)
-- Fetches content from URLs in user profile
-- Combines all information into a comprehensive profile
-- Generates and stores profile embeddings
-
-**Input**:
-- JSON file: `input_documents/<username>.json` with structure:
+Example JSON format:
 ```json
 {
   "person": {
-    "name": "User Name",
-    "biographical_information": {
-      "research_interests": ["AI", "ML", ...],
-      "education": [...],
-      "awards": [...]
-    },
+    "name": "Your Name",
+    "summary": "Brief bio",
     "links": [
-      {"url": "https://...", "type": "faculty_profile"}
-    ]
+      {
+        "url": "https://faculty.university.edu/profile",
+        "type": "faculty_profile"
+      },
+      {
+        "url": "https://scholar.google.com/citations?user=ID",
+        "type": "academic_profile"
+      }
+    ],
+    "biographical_information": {
+      "research_interests": ["AI", "Machine Learning"],
+      "education": [],
+      "awards": []
+    }
   }
 }
 ```
-- PDF files in `input_documents/`
 
-**Output**: User profile embeddings in ChromaDB
+### 3. Matching
+Go to the Matching tab to:
+- Select a user profile
+- View matched funding opportunities
+- See AI-generated explanations for each match
+- Export results
 
-### Step 3: Match User with Opportunities
+## Data Sources
 
-```bash
-python match_opportunities.py
-```
+The system can process funding opportunities from:
+- NSF (National Science Foundation)
+- SBIR/STTR programs
+- SAM.gov federal opportunities
+- Grants.gov
+- Custom CSV files
 
-This script:
-- Retrieves user profile embeddings
-- Searches for similar funding opportunities
-- Calculates confidence scores
-- Ranks opportunities by relevance
+## API Endpoints
 
-**Output**: `output_results/user_funding_matches.json`
+- `POST /api/ingest/csv` - Upload funding opportunity CSV
+- `POST /api/profile/create` - Create user profile
+- `POST /api/profile/update` - Update existing profile
+- `GET /api/users` - List all users
+- `POST /api/match` - Match user with opportunities
+- `GET /api/opportunities` - List all opportunities
 
-### Step 4: Generate RAG Explanations
+## Performance
 
-```bash
-python generate_rag_explanations.py
-```
-
-This script:
-- Takes top matched opportunities
-- Generates personalized explanations using Gemini
-- Identifies reusable proposals/papers
-- Provides specific next steps
-
-**Output**: `output_results/user_funding_matches_explained.json`
-
-### Step 5: Run Complete Pipeline
-
-```bash
-python main.py
-```
-
-Runs the entire pipeline:
-1. Process any new CSV files
-2. Create/update user profile
-3. Match with opportunities
-4. Generate explanations for top matches
-5. Save comprehensive report
-
-## Output Files
-
-### user_funding_matches.json
-```json
-{
-  "user": {
-    "name": "User Name",
-    "research_interests": [...]
-  },
-  "matches": [
-    {
-      "title": "Opportunity Title",
-      "confidence_score": 85.5,
-      "agency": "NSF",
-      "deadline": "2025-12-31",
-      "url": "https://..."
-    }
-  ]
-}
-```
-
-### user_funding_matches_explained.json
-```json
-{
-  "explained_opportunities": [
-    {
-      "title": "Opportunity Title",
-      "confidence_score": 85.5,
-      "rag_explanation": {
-        "match_explanation": "This opportunity aligns with your expertise in...",
-        "reusable_content": [
-          {
-            "document": "previous_proposal.pdf",
-            "how_to_reuse": "Adapt the methodology section..."
-          }
-        ],
-        "next_steps": [
-          "Review the full solicitation",
-          "Contact program officer",
-          "Prepare 2-page concept paper"
-        ]
-      }
-    }
-  ]
-}
-```
-
-## Configuration
-
-### Embeddings Configuration
-- Model: `models/text-embedding-004`
-- Dimensions: 768
-- Task types: RETRIEVAL_DOCUMENT, RETRIEVAL_QUERY
-
-### RAG Configuration
-- Model: `gemini-2.0-flash-exp`
-- Temperature: 0.7
-- Max tokens: 1000
-
-### Rate Limiting
-- Embeddings: 140 requests/minute
-- URL fetching: 10 second timeout
+- Gemini API: 60 requests per minute rate limit
+- Embedding generation: ~0.1s per document
+- Vector search: Sub-second for 10k+ opportunities
+- Batch processing: 5-20 opportunities at a time
 
 ## Troubleshooting
 
-### Common Issues
+### Port Already in Use
+The start script automatically kills processes on ports 5001 and 3000. If issues persist:
+```bash
+./stop_app.sh
+./start_app.sh
+```
 
-1. **API Key Error**
-   - Ensure `GEMINI_API_KEY` is set in `.env`
-   - Check API key validity
+### ChromaDB Corruption
+If you see "no such column" errors, the vector database is corrupted:
+```bash
+rm -rf chroma_db
+./start_app.sh
+```
 
-2. **PDF Extraction Failed**
-   - Ensure PDFs are text-based, not scanned images
-   - Check file permissions
+### Missing Dependencies
+```bash
+# Python
+pip install -r requirements.txt
 
-3. **Low Confidence Scores**
-   - Normal range is 15-30% for cosine similarity
-   - Focus on relative ranking, not absolute scores
-
-4. **ChromaDB Errors**
-   - Delete `chroma_db/` folder to reset database
-   - Check disk space
+# Frontend
+cd frontend && npm install
+```
 
 ## Development
 
-### Adding New Features
-
-1. **New Data Sources**: Extend `funding_opportunities_manager.py`
-2. **Custom Embeddings**: Modify `embeddings_manager.py`
-3. **Matching Algorithm**: Update `user_profile_manager.py`
-4. **Explanation Format**: Customize `rag_explainer.py`
-
-### Testing
-
-Run comprehensive tests:
+### Running Tests
 ```bash
-python run_tests.py
+# No automated tests currently
+# Use --quick and --test flags on processing scripts for testing
 ```
+
+### Adding New Funding Sources
+1. Create a CSV processor in `backend/funding_opportunities_manager.py`
+2. Add field mappings for the new format
+3. Update the frontend if needed
 
 ## License
 
-This project is proprietary. All rights reserved.
+This project is licensed under the MIT License.
 
-## Support
+## Contributors
 
-For issues or questions, please contact the development team or check the release notes in `release_notes/` directory.
+- Alfredo Costilla-Reyes (alfredocostilla)
+
+## Acknowledgments
+
+- Google Gemini for embeddings and AI capabilities
+- ChromaDB for vector storage
+- NSF, SBIR, SAM.gov for funding data

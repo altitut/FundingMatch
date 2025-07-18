@@ -1,29 +1,620 @@
 {
   "opportunities": {
-    "97965a6ce1c9cb1b29864641920afa43": {
-      "title": "National Science Foundation Translation to Practice (NSF TTP)",
-      "processed_date": "2025-07-17T17:26:18.124609",
-      "expiration_date": null
+    "a88652324b95095f482e974fbe93d870": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Low-Cost, Expendable, Launch-Agnostic Space Separation System",
+      "agency": "DOD",
+      "topic_number": "SF254-01006\t",
+      "processed_at": "2025-07-18T23:00:35.455951+00:00",
+      "expiration_date": "2025-08-20T00:00:00+00:00"
     },
-    "5c4330fd9dc62f8a7429040188f71480": {
-      "title": "Verticals-enabling Intelligent Network Systems (VINES)",
-      "processed_date": "2025-07-17T17:26:19.146310",
-      "expiration_date": null
+    "2c926901ff7c2fd83989454a2a60875a": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Autonomous Modular Material Handling Equipment for Space Logistics Operations",
+      "agency": "DOD",
+      "topic_number": "SF254-D1004",
+      "processed_at": "2025-07-18T23:00:35.456079+00:00",
+      "expiration_date": "2025-08-20T00:00:00+00:00"
     },
-    "23351a66905b0967d2b206c31a415916": {
-      "title": "Education and Broadening Participation in Earth Sciences (EAR EBP)",
-      "processed_date": "2025-07-17T17:26:20.167936",
-      "expiration_date": null
+    "62c6a408ad9f214416f3a3417a5e32ce": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Photonic Crystal Surface-Emitting Lasers (PCSEL) for Advanced Laser Systems",
+      "agency": "DOD",
+      "topic_number": "A25D-020",
+      "processed_at": "2025-07-18T23:00:35.456092+00:00",
+      "expiration_date": "2025-08-20T00:00:00+00:00"
     },
-    "ec10fa88af9a97c4b85bab69ebaf4974": {
-      "title": "The Research on Research Security Program (RoRS)",
-      "processed_date": "2025-07-17T17:26:21.087875",
-      "expiration_date": null
+    "85845ee12d6be14f852f00aa16449766": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Underwater Sensing in Surf Zone Environments",
+      "agency": "DOD",
+      "topic_number": "A254-046",
+      "processed_at": "2025-07-18T23:00:35.456095+00:00",
+      "expiration_date": "2025-08-20T00:00:00+00:00"
     },
-    "98c4f57d345a229dea7169af6c6c93bc": {
-      "title": "Incorporating Human Behavior in Epidemiological Models (IHBEM)",
-      "processed_date": "2025-07-17T17:26:21.962399",
-      "expiration_date": null
+    "7ebf904fac39691178c7d00ce3978fcb": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Photonic Crystal Surface-Emitting Lasers (PCSEL) for Advanced Laser Systems ",
+      "agency": "DOD",
+      "topic_number": "A254-047",
+      "processed_at": "2025-07-18T23:00:35.456098+00:00",
+      "expiration_date": "2025-08-20T00:00:00+00:00"
+    },
+    "e4381dbb2018e9c01037bf5354988ede": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Autonomous Space Cargo Network (ASCN): AI-Driven Logistics Automation and Digital Twin Integration for Space Mobility",
+      "agency": "DOD",
+      "topic_number": "SF254-01001",
+      "processed_at": "2025-07-18T23:00:42.538997+00:00",
+      "expiration_date": "2025-08-20T00:00:00+00:00"
+    },
+    "adcea5651fbaad5775ccc38d0606c869": {
+      "file": "topics_search_1752873350.csv",
+      "title": " Affordable Thermal Protection Solution (ARMREST)",
+      "agency": "DOD",
+      "topic_number": "SF254-01005",
+      "processed_at": "2025-07-18T23:00:42.539027+00:00",
+      "expiration_date": "2025-08-20T00:00:00+00:00"
+    },
+    "843112e2869587bd37bb479a776c137a": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Project ASTROPAC: Intelligent Cargo Configuration and Deployment Planning for Enhanced Readiness",
+      "agency": "DOD",
+      "topic_number": "SF254-D1001",
+      "processed_at": "2025-07-18T23:00:42.539032+00:00",
+      "expiration_date": "2025-08-20T00:00:00+00:00"
+    },
+    "2decb27bda3cd91743445e8de7238fce": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Real-Time Detection and Tracking of High-Velocity Atmospheric Transits",
+      "agency": "DOD",
+      "topic_number": "SF254-D1006",
+      "processed_at": "2025-07-18T23:00:42.539036+00:00",
+      "expiration_date": "2025-08-20T00:00:00+00:00"
+    },
+    "f27b294c0d8c67e8a14eafbdbe6f7140": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Underwater Sensing in Surf Zone Environments",
+      "agency": "DOD",
+      "topic_number": "A25D-019",
+      "processed_at": "2025-07-18T23:00:42.539040+00:00",
+      "expiration_date": "2025-08-20T00:00:00+00:00"
+    },
+    "7f4b52ed27191f72911bd3499ff43b12": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Project AXIS 54: AI-Enabled Framework for Space Sustainment Technology Prioritization",
+      "agency": "DOD",
+      "topic_number": "SF254-01003",
+      "processed_at": "2025-07-18T23:00:49.773112+00:00",
+      "expiration_date": "2025-08-20T00:00:00+00:00"
+    },
+    "0d024f9e451992e8f3bb1cefb60fab3e": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Project SpaceKnight: Interactive AI Simulation for USSF Space Sustainment and Contested Logistics Wargaming",
+      "agency": "DOD",
+      "topic_number": "SF254-01002",
+      "processed_at": "2025-07-18T23:00:49.773151+00:00",
+      "expiration_date": "2025-08-20T00:00:00+00:00"
+    },
+    "e55b91e63e7cd983133d47804d97fa7c": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Quantum for Space Logistics Demand Planning & Optimization",
+      "agency": "DOD",
+      "topic_number": "SF254-01004",
+      "processed_at": "2025-07-18T23:00:49.773156+00:00",
+      "expiration_date": "2025-08-20T00:00:00+00:00"
+    },
+    "2c3d7d0f2311ee4cbb686d1ba8a71a58": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Project KARMEN: Rapid-Turnaround Spacelift Cargo Test Platform for Empirical Qualification ",
+      "agency": "DOD",
+      "topic_number": "SF254-D1002",
+      "processed_at": "2025-07-18T23:00:49.773160+00:00",
+      "expiration_date": "2025-08-20T00:00:00+00:00"
+    },
+    "e3553f3af2456071c34267cc2ca89b9a": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Virtual Space Cargo Deployment Function for AI-Driven Logistics Planning and Simulation",
+      "agency": "DOD",
+      "topic_number": "SF254-D1003",
+      "processed_at": "2025-07-18T23:00:49.773163+00:00",
+      "expiration_date": "2025-08-20T00:00:00+00:00"
+    },
+    "af735359ea5e5824afd5f7657973075c": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Affordable Release Mechanism (ARM)",
+      "agency": "DOD",
+      "topic_number": "SF254-D1005",
+      "processed_at": "2025-07-18T23:00:56.970900+00:00",
+      "expiration_date": "2025-08-20T00:00:00+00:00"
+    },
+    "faaa8967f9980c7b57b2fd2a5fe9f28d": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Phase I Call for Innovative Defense-Related Dual-Purpose Technologies/Solutions with a Clear Air Force Stakeholder Need",
+      "agency": "DOD",
+      "topic_number": "AFX25E-PTCSO",
+      "processed_at": "2025-07-18T23:00:56.970928+00:00",
+      "expiration_date": "2025-08-05T00:00:00+00:00"
+    },
+    "af727c5ae34eedceb7cca850ca209467": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Phase I Call for Innovative Defense-Related Dual-Purpose Technologies/Solutions with a Clear Space Force Stakeholder Need",
+      "agency": "DOD",
+      "topic_number": "AFX25E-PTCSO2",
+      "processed_at": "2025-07-18T23:00:56.970933+00:00",
+      "expiration_date": "2025-08-05T00:00:00+00:00"
+    },
+    "5124eab10e6b6499a33ec265511912c3": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Phase I Call for Innovative Defense-Related Dual-Purpose Technologies/Solutions with a Clear Air Force Stakeholder Need",
+      "agency": "DOD",
+      "topic_number": "AFX255-PCSO1 ",
+      "processed_at": "2025-07-18T23:00:56.970938+00:00",
+      "expiration_date": "2025-08-05T00:00:00+00:00"
+    },
+    "45fe12c1d3d4731bb3ec5717f5b414f0": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Phase I Call for Innovative Defense-Related Dual-Purpose Technologies/Solutions with a Clear Space Force Stakeholder Need",
+      "agency": "DOD",
+      "topic_number": "AFX255-PCSO2",
+      "processed_at": "2025-07-18T23:00:56.970941+00:00",
+      "expiration_date": "2025-08-05T00:00:00+00:00"
+    },
+    "0b621add19add816e7e4be7841793fa8": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Multi-Fuel Platoon Power Generator",
+      "agency": "DOD",
+      "topic_number": "A254-040",
+      "processed_at": "2025-07-18T23:01:04.003682+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "9847d4a117541d7a00e03141796cc719": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Additive Manufacturing for Circuitry",
+      "agency": "DOD",
+      "topic_number": "A254-043",
+      "processed_at": "2025-07-18T23:01:04.003700+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "e8fef9e60268848a0d6516d2d4315141": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Faraday optical isolator on a photonic integrated laser circuit",
+      "agency": "DOD",
+      "topic_number": "O254-009",
+      "processed_at": "2025-07-18T23:01:04.003704+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "ba802b33cb4aa730bd9879cf40537f55": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Innovative Interceptor Seekers for Missile Defense in the Space Domain",
+      "agency": "DOD",
+      "topic_number": "MDA254-D005",
+      "processed_at": "2025-07-18T23:01:04.003707+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "cbdf334448621aa876900703087ce99e": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Photonic Integrated NV Center in Diamond Vector Magnetometers",
+      "agency": "DOD",
+      "topic_number": "O254-007",
+      "processed_at": "2025-07-18T23:01:04.003710+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "60b74d8421c89636ada9dfb64d178c02": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Integrated low noise laser for Barium ion qubits",
+      "agency": "DOD",
+      "topic_number": "O254-D08",
+      "processed_at": "2025-07-18T23:01:11.146080+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "b33665e870f0b414d781639993e8b5b9": {
+      "file": "topics_search_1752873350.csv",
+      "title": "PEO SOF Warrior - Secure and Protect Infrastructure through Cyber-threat Emulation (SPICE) Open Topic",
+      "agency": "DOD",
+      "topic_number": "SOCOM254-P0005",
+      "processed_at": "2025-07-18T23:01:11.146110+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "a54b89f982e75a3b0ddfee7aa739dd7a": {
+      "file": "topics_search_1752873350.csv",
+      "title": "PEO SOF Warrior - Visual Augmentation Systems (VAS) Open Topic",
+      "agency": "DOD",
+      "topic_number": "SOCOM254-P006",
+      "processed_at": "2025-07-18T23:01:11.146114+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "38a23c953da0be3888fc98f4756bd15c": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Predict, Optimize, Recommend, and Track for Adaptive Logistics (PORTAL)\u200b",
+      "agency": "DOD",
+      "topic_number": "A254-045",
+      "processed_at": "2025-07-18T23:01:11.146117+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "1beeb760a7d5d75c2a9a853865f19743": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Cognitive Mapping for Counter-WMD Operations  ",
+      "agency": "DOD",
+      "topic_number": "DTRA254-002",
+      "processed_at": "2025-07-18T23:01:11.146120+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "0f2947486004fae80b08100d9a448c53": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Space-Based Firing Solutions",
+      "agency": "DOD",
+      "topic_number": "MDA254-D003\t",
+      "processed_at": "2025-07-18T23:01:18.191890+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "b58f8f83aced442a52632cd5147b5d00": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Lightweight Space Based Propulsion Technology for High Acceleration",
+      "agency": "DOD",
+      "topic_number": "MDA254-D004",
+      "processed_at": "2025-07-18T23:01:18.191918+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "5919145ad25c5d232bd9d997eface063": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Additive Manufacturing for Circuitry",
+      "agency": "DOD",
+      "topic_number": "A25D-018",
+      "processed_at": "2025-07-18T23:01:18.191923+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "eca79946017688437dfc0c12e90c676a": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Mechanics and Control of Autonomous Legged Robotic Systems in Mud",
+      "agency": "DOD",
+      "topic_number": "A254-042",
+      "processed_at": "2025-07-18T23:01:18.191927+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "4243a8772eb5960ab749c6712617238c": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Long-Range Joint Precision Airdrop System (LR-JPADS)",
+      "agency": "DOD",
+      "topic_number": "A254-044",
+      "processed_at": "2025-07-18T23:01:18.191931+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "e75f5e065b622a4a96dbf75ceac3e2ad": {
+      "file": "topics_search_1752873350.csv",
+      "title": "VCSELs for Quantum Sensors",
+      "agency": "DOD",
+      "topic_number": "O254-D04",
+      "processed_at": "2025-07-18T23:01:25.166582+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "5bdee9d2985600be1929ac1a74794ff0": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Multi-channel amplification on chip for scalable quantum & DE applications",
+      "agency": "DOD",
+      "topic_number": "O254-D05",
+      "processed_at": "2025-07-18T23:01:25.166596+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "24310f0938eee4658787471f0896204e": {
+      "file": "topics_search_1752873350.csv",
+      "title": " Integration of Wave Relay API Features into the Thales InterSense IS-1500 Visual Inertial Tracking Software)",
+      "agency": "DOD",
+      "topic_number": "DTRA254-004",
+      "processed_at": "2025-07-18T23:01:25.166599+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "a79afa5a0a404723d81d5c951b92267a": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Low Cost Interceptors for Missile Defense",
+      "agency": "DOD",
+      "topic_number": "MDA254-D006",
+      "processed_at": "2025-07-18T23:01:25.166602+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "dd4e662525b62dffb930f8ddc6935bf7": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Multi-Fuel Platoon Power Generator",
+      "agency": "DOD",
+      "topic_number": "A25D-015",
+      "processed_at": "2025-07-18T23:01:25.166604+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "8ec6af6c4d6890607e13048b4192a42d": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Mechanics and Control of Autonomous Legged Robotic Systems in Mud",
+      "agency": "DOD",
+      "topic_number": "A25D-017",
+      "processed_at": "2025-07-18T23:01:32.320344+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "95f553faa03eabd31e81f3e98bc0562d": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Mode-Locked Lasers on Chip toward Frequency Combs and Quantum Applications    ",
+      "agency": "DOD",
+      "topic_number": "O254-D06",
+      "processed_at": "2025-07-18T23:01:32.320377+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "5011fcbe6b29819b25ff3074b9e6ed3d": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Blast Injury Simulation in Armored Vehicles Affected by Blast Pressure, Shaped Charge, or Dense Inert Projectile Weapons",
+      "agency": "DOD",
+      "topic_number": "DTRA254-001",
+      "processed_at": "2025-07-18T23:01:32.320381+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "4f13d40be631288a19ab665be57032c0": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Droppable Chemical Warfare Agent Sensor",
+      "agency": "DOD",
+      "topic_number": "DTRA254-003",
+      "processed_at": "2025-07-18T23:01:32.320387+00:00",
+      "expiration_date": "2025-07-23T00:00:00+00:00"
+    },
+    "023dd0d87b759113f4a150aa9b19d7ba": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Development of devices, diagnostic technologies, or digital health tools for treatment, detection, and diagnosis of Pediatric Cancers and/or Rare Cancers",
+      "agency": "HHS",
+      "topic_number": "2",
+      "processed_at": "2025-07-18T23:01:32.320391+00:00",
+      "expiration_date": "2025-10-17T00:00:00+00:00"
+    },
+    "8a833b12f7c1328ea6919e77e9eed22c": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Blueprint Neurotherapeutics Network (BPN): Biologic-based Drug Discovery and Development for Disorders of the Nervous System (U44 Clinical Trial Optional)",
+      "agency": "HHS",
+      "topic_number": "PAR-24-294",
+      "processed_at": "2025-07-18T23:01:47.425910+00:00",
+      "expiration_date": "2027-08-19T00:00:00+00:00"
+    },
+    "e2b80a15476f859f34a84c1580f77578": {
+      "file": "topics_search_1752873350.csv",
+      "title": "NeuroNEXT Small Business Innovation in Clinical Trials (U44 Clinical Trial Optional)",
+      "agency": "HHS",
+      "topic_number": "PAR-25-133",
+      "processed_at": "2025-07-18T23:01:47.425924+00:00",
+      "expiration_date": "2027-09-06T00:00:00+00:00"
+    },
+    "2ba2a5d6e7d19580241d35976cafb850": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Small Business Transition Grant for New Entrepreneurs (R41/R42 Clinical Trial Not Allowed)",
+      "agency": "HHS",
+      "topic_number": "PAR-24-133",
+      "processed_at": "2025-07-18T23:01:47.425926+00:00",
+      "expiration_date": "2027-04-06T00:00:00+00:00"
+    },
+    "77c9e9531cbd73f0b278b77a33204189": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Small Business Transition Grant for New Entrepreneurs (R41/R42 Clinical Trial Required)",
+      "agency": "HHS",
+      "topic_number": "PAR-24-134",
+      "processed_at": "2025-07-18T23:01:47.425929+00:00",
+      "expiration_date": "2027-04-06T00:00:00+00:00"
+    },
+    "6eec7ec293f9b01ff32c528900c0685f": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Small Business Transition Grant for New Entrepreneurs (R43/R44 Clinical Trial Required)",
+      "agency": "HHS",
+      "topic_number": "PAR-24-132",
+      "processed_at": "2025-07-18T23:01:47.425933+00:00",
+      "expiration_date": "2027-04-06T00:00:00+00:00"
+    },
+    "d8696821342eabbfe515b61a22670884": {
+      "file": "topics_search_1752873350.csv",
+      "title": "PHS 2024-2 Omnibus Solicitation of the NIH for Small Business Technology Transfer Grant Applications (Parent STTR [R41/R42] Clinical Trial Not Allowed)",
+      "agency": "HHS",
+      "topic_number": "PA-24-247",
+      "processed_at": "2025-07-18T23:01:55.144384+00:00",
+      "expiration_date": "2025-09-06T00:00:00+00:00"
+    },
+    "a39afadc103b2c1b54849e78ba2d487e": {
+      "file": "topics_search_1752873350.csv",
+      "title": "NINDS Renewal Awards of SBIR Phase II Grants (Phase IIB) for Pre-Clinical Research (R44 Clinical Trial Not Allowed)",
+      "agency": "HHS",
+      "topic_number": "PAR-24-222",
+      "processed_at": "2025-07-18T23:01:55.144403+00:00",
+      "expiration_date": "2027-04-06T00:00:00+00:00"
+    },
+    "9d76259ebb6bf38c2f8c46e4c23f68bc": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Small Business Transition Grant for New Entrepreneurs (R43/R44 Clinical Trial Not Allowed)",
+      "agency": "HHS",
+      "topic_number": "PAR-24-131",
+      "processed_at": "2025-07-18T23:01:55.144410+00:00",
+      "expiration_date": "2027-04-06T00:00:00+00:00"
+    },
+    "93e393e86c800b2e482ebc26c70d0ec1": {
+      "file": "topics_search_1752873350.csv",
+      "title": "NINDS Renewal Awards of SBIR Phase II Grants (Phase IIB) for Clinical Trials and Clinical Research (R44 Clinical Trial Optional)",
+      "agency": "HHS",
+      "topic_number": "PAR-24-221",
+      "processed_at": "2025-07-18T23:01:55.144413+00:00",
+      "expiration_date": "2027-04-06T00:00:00+00:00"
+    },
+    "a79ef8b31d3b6246b03f308f721789b4": {
+      "file": "topics_search_1752873350.csv",
+      "title": "PHS 2024-2 Omnibus Solicitation of the NIH, CDC and FDA for Small Business Innovation Research Grant Applications (Parent SBIR [R43/R44] Clinical Trial Not Allowed)",
+      "agency": "HHS",
+      "topic_number": "PA-24-245",
+      "processed_at": "2025-07-18T23:01:55.144417+00:00",
+      "expiration_date": "2025-09-06T00:00:00+00:00"
+    },
+    "c9cb9516e12a02b774583b8d706624e1": {
+      "file": "topics_search_1752873350.csv",
+      "title": "PHS 2024-2 Omnibus Solicitation of the NIH and CDC for Small Business Innovation Research Grant Applications (Parent SBIR [R43/R44] Clinical Trial Required)",
+      "agency": "HHS",
+      "topic_number": "PA-24-246",
+      "processed_at": "2025-07-18T23:02:02.747827+00:00",
+      "expiration_date": "2025-09-06T00:00:00+00:00"
+    },
+    "37bbb2b6708abf6d877964be116ded94": {
+      "file": "topics_search_1752873350.csv",
+      "title": "PHS 2024-2 Omnibus Solicitation of the NIH for Small Business Technology Transfer Grant Applications (Parent STTR [R41/R42] Clinical Trial Required)",
+      "agency": "HHS",
+      "topic_number": "PA-24-248",
+      "processed_at": "2025-07-18T23:02:02.747840+00:00",
+      "expiration_date": "2025-09-06T00:00:00+00:00"
+    },
+    "401fdc72120b07ee6b9685cb604e41a3": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Innovations for Healthy Living - Improving Minority Health and Eliminating Health Disparities (R43/R44 - Clinical Trial Optional)",
+      "agency": "HHS",
+      "topic_number": "RFA-MD-24-006",
+      "processed_at": "2025-07-18T23:02:02.747843+00:00",
+      "expiration_date": "2026-12-10T00:00:00+00:00"
+    },
+    "8d0648514b87db581e4cda8cb58903fe": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Technologies for Improving Minority Health and Eliminating Health Disparities (R41/R42- Clinical Trial Optional)",
+      "agency": "HHS",
+      "topic_number": "RFA-MD-24-007",
+      "processed_at": "2025-07-18T23:02:02.747846+00:00",
+      "expiration_date": "2026-12-10T00:00:00+00:00"
+    },
+    "a1b563300bcc40550e450c373485fd2a": {
+      "file": "topics_search_1752873350.csv",
+      "title": "NIAID SBIR Phase II Clinical Trial Implementation Cooperative Agreement (U44 Clinical Trial Required)",
+      "agency": "HHS",
+      "topic_number": "PAR-24-099",
+      "processed_at": "2025-07-18T23:02:02.747848+00:00",
+      "expiration_date": "2027-01-14T00:00:00+00:00"
+    },
+    "355557a4a03bc84828f5fd06bef1a7d0": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Analytical Validation of a Candidate Biomarker for Neurological or Neuromuscular Disorders (U44 Clinical Trial Optional)",
+      "agency": "HHS",
+      "topic_number": "PAR-24-098",
+      "processed_at": "2025-07-18T23:02:10.198757+00:00",
+      "expiration_date": "2026-06-26T00:00:00+00:00"
+    },
+    "3b7ffdf1a8a3146b7ec53916ad076c1a": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Clinical Validation of a Candidate Biomarker for Neurological or Neuromuscular Disorders (U44 Clinical Trial Optional)",
+      "agency": "HHS",
+      "topic_number": "PAR-24-096",
+      "processed_at": "2025-07-18T23:02:10.198775+00:00",
+      "expiration_date": "2026-06-23T00:00:00+00:00"
+    },
+    "df771fda39b294c5dc2a23b6933256d6": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Seeking Products to Address Social Needs impacting Substance Use Disorders (SUD) (R41/R42 Clinical Trial Optional)",
+      "agency": "HHS",
+      "topic_number": "RFA-DA-25-047",
+      "processed_at": "2025-07-18T23:02:10.198778+00:00",
+      "expiration_date": "2026-03-14T00:00:00+00:00"
+    },
+    "e5476a5f7bea6b3bdb4e025cbaa54f3a": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Seeking Products to Address Social Needs impacting Substance Use Disorders (SUD) (R43/R44 Clinical Trial Optional)",
+      "agency": "HHS",
+      "topic_number": "RFA-DA-25-048",
+      "processed_at": "2025-07-18T23:02:10.198781+00:00",
+      "expiration_date": "2026-03-14T00:00:00+00:00"
+    },
+    "6dd6d689a046cdc55e5644d41e57f5c0": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Miniaturization and Automation of Tissue Chip Systems (MATChS) (UT1/UT2 - Clinical Trial Not Allowed)",
+      "agency": "HHS",
+      "topic_number": "RFA-TR-23-018",
+      "processed_at": "2025-07-18T23:02:10.198783+00:00",
+      "expiration_date": "2026-02-24T00:00:00+00:00"
+    },
+    "f6104c3c10e9efdc6b2402b7c5755218": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Miniaturization and Automation of Tissue Chip Systems (MATChS) (U43/U44 Clinical Trial Not Allowed)",
+      "agency": "HHS",
+      "topic_number": "RFA-TR-23-017",
+      "processed_at": "2025-07-18T23:02:18.110387+00:00",
+      "expiration_date": "2026-02-24T00:00:00+00:00"
+    },
+    "9e3e63bdfa1f4d77886eba2b2fda1b79": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Blueprint Neurotherapeutics Network (BPN): Small Molecule Drug Discovery and Development for Disorders of the Nervous System (U44 Clinical Trial Optional)",
+      "agency": "HHS",
+      "topic_number": "PAR-24-063",
+      "processed_at": "2025-07-18T23:02:18.110402+00:00",
+      "expiration_date": "2026-08-19T00:00:00+00:00"
+    },
+    "7f4b78859137d811aff55a281396ce0f": {
+      "file": "topics_search_1752873350.csv",
+      "title": "NINDS Exploratory Clinical Trials for Small Business (R43/R44 Clinical Trial Required)",
+      "agency": "HHS",
+      "topic_number": "PAR-23-311",
+      "processed_at": "2025-07-18T23:02:18.110405+00:00",
+      "expiration_date": "2026-09-06T00:00:00+00:00"
+    },
+    "2ed5bb7e6f49d952cdd369322244c090": {
+      "file": "topics_search_1752873350.csv",
+      "title": "NINDS Exploratory Clinical Trials for Small Business (R41/R42 Clinical Trial Required)",
+      "agency": "HHS",
+      "topic_number": "PAR-24-044",
+      "processed_at": "2025-07-18T23:02:18.110408+00:00",
+      "expiration_date": "2026-09-06T00:00:00+00:00"
+    },
+    "2493a12e7ad1e0662e6ff26a70f7fa7c": {
+      "file": "topics_search_1752873350.csv",
+      "title": "NEI Small Business Innovation Research (SBIR) Cooperative Agreement for Early-Stage Clinical Trials with Greater than Minimal Risk (U44-Clinical Trial Required)",
+      "agency": "HHS",
+      "topic_number": "PAR-24-066",
+      "processed_at": "2025-07-18T23:02:18.110411+00:00",
+      "expiration_date": "2027-01-08T00:00:00+00:00"
+    },
+    "3826a69468ad0418d4c89a33d65e666f": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Interactive Digital Media (IDM) Biomedical Science Resources for Pre-College Students and Teachers (SBIR) (R43/R44 Clinical Trial Not Allowed)",
+      "agency": "HHS",
+      "topic_number": "PAR-23-213",
+      "processed_at": "2025-07-18T23:02:25.718760+00:00",
+      "expiration_date": "2025-09-06T00:00:00+00:00"
+    },
+    "0f35fb66405a81a6081f16d511ff279d": {
+      "file": "topics_search_1752873350.csv",
+      "title": "SBIR/STTR Commercialization Readiness Pilot (CRP) Program Technical Assistance and Late Stage Development (SB1 Clinical Trial Required)",
+      "agency": "HHS",
+      "topic_number": "PAR-23-220",
+      "processed_at": "2025-07-18T23:02:25.718774+00:00",
+      "expiration_date": "2025-09-06T00:00:00+00:00"
+    },
+    "62bc39a276ff22c2097db32df884671c": {
+      "file": "topics_search_1752873350.csv",
+      "title": "SBIR/STTR Commercialization Readiness Pilot (CRP) Program Technical Assistance and Late Stage Development (SB1, Clinical Trial Not Allowed)",
+      "agency": "HHS",
+      "topic_number": "PAR-23-219",
+      "processed_at": "2025-07-18T23:02:25.718776+00:00",
+      "expiration_date": "2025-09-06T00:00:00+00:00"
+    },
+    "91420d88a53abe02218f3e42a0b50dc8": {
+      "file": "topics_search_1752873350.csv",
+      "title": "HEAL Commercialization Readiness Pilot (CRP) Program: Embedded Entrepreneurs for Small Businesses in Pain Management (SB1 Clinical Trial Not Allowed)",
+      "agency": "HHS",
+      "topic_number": "PAR-23-069",
+      "processed_at": "2025-07-18T23:02:25.718779+00:00",
+      "expiration_date": "2025-09-06T00:00:00+00:00"
+    },
+    "4a33434d59bf18484812b6c4c2017d8d": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Advancing Research on Alzheimer's Disease (AD) and AD-Related Dementias (ADRD) (R41/R42 Clinical Trial Optional)",
+      "agency": "HHS",
+      "topic_number": "PAS-22-197",
+      "processed_at": "2025-07-18T23:02:25.718781+00:00",
+      "expiration_date": "2025-09-06T00:00:00+00:00"
+    },
+    "6bdcab10e2a9133fd64e8b90cabfb3d3": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Advancing Research on Alzheimer's Disease (AD) and AD-Related Dementias (ADRD) (R43/R44 Clinical Trial Optional)",
+      "agency": "HHS",
+      "topic_number": "PAS-22-196",
+      "processed_at": "2025-07-18T23:02:28.780742+00:00",
+      "expiration_date": "2025-09-08T00:00:00+00:00"
+    },
+    "42d0bdb65ce0a1bf3f3eca2646f8c4d7": {
+      "file": "topics_search_1752873350.csv",
+      "title": "Late-Stage Translation of Biomedical and Behavioral Research Results in Arthritis and Musculoskeletal and Skin Diseases from Academic/Non-profit Lab to Marketplace (SBIR [R43/R44] Clinical Trial Not Allowed)",
+      "agency": "HHS",
+      "topic_number": "PAR-23-032",
+      "processed_at": "2025-07-18T23:02:28.780770+00:00",
+      "expiration_date": "2025-09-06T00:00:00+00:00"
     }
   },
   "last_cleanup": null

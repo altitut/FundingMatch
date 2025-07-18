@@ -49,6 +49,7 @@ class FundingOpportunitiesManager:
         # Track processed opportunities
         self.processed_ids_file = self.funding_dir / "processed_opportunities.json"
         self.processed_ids = self._load_processed_ids()
+        print(f"Loaded {len(self.processed_ids.get('opportunities', {}))} previously processed opportunities")
         
     def _load_processed_ids(self) -> Dict[str, Any]:
         """Load set of processed opportunity IDs"""
@@ -64,11 +65,37 @@ class FundingOpportunitiesManager:
     
     def _generate_opportunity_id(self, opportunity: Dict[str, Any]) -> str:
         """Generate unique ID for an opportunity based on its content"""
-        # Create a unique ID based on key fields
-        id_string = f"{opportunity.get('title', '')}"
-        id_string += f"{opportunity.get('agency', '')}"
-        id_string += f"{opportunity.get('program_id', '')}"
-        id_string += f"{opportunity.get('topic_number', '')}"
+        # Use core stable identifiers only - remove description which can vary
+        # Normalize title by lowercasing and stripping whitespace
+        title = opportunity.get('title', '').lower().strip()
+        agency = opportunity.get('agency', '').strip()
+        
+        # For SBIR, topic number is the key differentiator
+        topic_number = (opportunity.get('topic_number', '') or 
+                       opportunity.get('Topic Number', '')).strip()
+        
+        # Core ID components
+        id_string = f"{title}"
+        id_string += f"|{agency}"
+        
+        # If we have a topic number, that's usually unique enough with title+agency
+        if topic_number:
+            id_string += f"|{topic_number}"
+        else:
+            # For non-SBIR, use program_id and branch as additional differentiators
+            id_string += f"|{opportunity.get('program_id', '').strip()}"
+            id_string += f"|{opportunity.get('branch', '').strip()}"
+            
+        # Only add phase/year if they exist to avoid false duplicates
+        phase = opportunity.get('phase', '').strip()
+        if phase:
+            id_string += f"|{phase}"
+            
+        # Year is important for differentiating annual solicitations
+        year = (opportunity.get('year', '') or 
+                opportunity.get('Solicitation Year', '')).strip()
+        if year:
+            id_string += f"|{year}"
         
         # Generate hash
         return hashlib.md5(id_string.encode()).hexdigest()
@@ -87,6 +114,9 @@ class FundingOpportunitiesManager:
         
         if url:
             print(f"  🌐 Fetching content from: {url[:60]}...")
+            # Add small delay to avoid rate limiting
+            import time
+            time.sleep(0.5)
             url_content = self.url_fetcher.fetch_url_content(url)
             
             if url_content:
@@ -165,6 +195,45 @@ class FundingOpportunitiesManager:
                 
         return None
     
+    def _extract_deadline_with_gemini(self, opportunity: Dict[str, Any]) -> Optional[str]:
+        """Use Gemini to extract deadline from opportunity description"""
+        try:
+            # Combine all text fields
+            text = f"""
+            Title: {opportunity.get('title', '')}
+            Description: {opportunity.get('description', '')}
+            URL Content: {opportunity.get('url_content', {}).get('text', '')[:1000]}
+            """
+            
+            prompt = """Extract the deadline or close date from this funding opportunity. 
+            Return ONLY the date in format YYYY-MM-DD. 
+            If no deadline is found, return 'NO_DEADLINE'.
+            If the deadline is expressed as 'anytime' or 'continuous', return 'ANYTIME'.
+            
+            Text: {text}
+            """
+            
+            # Use Gemini to extract deadline
+            from google import genai
+            import os
+            client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
+            response = client.models.generate_content(
+                model='gemini-2.0-flash-exp',
+                contents=[prompt.format(text=text)]
+            )
+            
+            result = response.text.strip()
+            if result not in ['NO_DEADLINE', 'ANYTIME']:
+                # Try to parse the date
+                parsed_date = self._parse_date(result)
+                if parsed_date:
+                    return result
+                    
+        except Exception as e:
+            print(f"  ⚠️ Error extracting deadline with Gemini: {e}")
+            
+        return None
+    
     def _is_expired(self, opportunity: Dict[str, Any]) -> Tuple[bool, Optional[datetime]]:
         """
         Check if an opportunity is expired
@@ -184,7 +253,23 @@ class FundingOpportunitiesManager:
                 if exp_date:
                     return exp_date < now, exp_date
                     
-        # If no date found, consider not expired
+        # If no date found in standard fields, try Gemini extraction (disable for now to save API calls)
+        # Uncomment the following lines to enable Gemini deadline extraction
+        # gemini_deadline = self._extract_deadline_with_gemini(opportunity)
+        # if gemini_deadline and gemini_deadline not in ['NO_DEADLINE', 'ANYTIME']:
+        #     # Add the extracted deadline to the opportunity
+        #     opportunity['close_date'] = gemini_deadline
+        #     exp_date = self._parse_date(gemini_deadline)
+        #     if exp_date:
+        #         return exp_date < now, exp_date
+        # elif gemini_deadline == 'ANYTIME':
+        #     # Set far future date for continuous opportunities
+        #     opportunity['close_date'] = 'Continuous'
+        #     far_future = datetime(2030, 12, 31, tzinfo=timezone.utc)
+        #     return False, far_future
+            
+        # If no date found at all, consider not expired but flag it
+        opportunity['close_date'] = 'Not specified'
         return False, None
     
     def process_csv_files(self, batch_size: int = 20) -> Dict[str, Any]:
@@ -250,6 +335,307 @@ class FundingOpportunitiesManager:
         
         # Save processed IDs
         self._save_processed_ids()
+        
+        return summary
+    
+    def process_single_csv_file(self, filename: str, progress_callback=None) -> Dict[str, Any]:
+        """
+        Process a single CSV file with progress tracking
+        
+        Args:
+            filename: Name of CSV file to process
+            progress_callback: Optional callback function for progress updates
+            
+        Returns:
+            Processing summary
+        """
+        csv_path = self.funding_dir / filename
+        
+        if not csv_path.exists():
+            raise FileNotFoundError(f"CSV file not found: {filename}")
+        
+        summary = {
+            "filename": filename,
+            "new_opportunities": 0,
+            "expired_skipped": 0,
+            "duplicate_skipped": 0,
+            "errors": [],
+            "unprocessed": []  # Track unprocessed opportunities with reasons
+        }
+        
+        # Send initial progress
+        if progress_callback:
+            progress_callback({
+                "status": "processing",
+                "stage": "reading",
+                "message": f"Reading {filename}..."
+            })
+        
+        try:
+            # Process based on file type
+            if "nsf" in filename.lower():
+                opportunities = self._process_nsf_csv(csv_path)
+                if progress_callback:
+                    progress_callback({
+                        "status": "processing",
+                        "stage": "debug",
+                        "message": f"Processing as NSF file"
+                    })
+            elif "sbir" in filename.lower() or "topics" in filename.lower():
+                opportunities = self._process_sbir_csv(csv_path)
+                if progress_callback:
+                    progress_callback({
+                        "status": "processing",
+                        "stage": "debug",
+                        "message": f"Processing as SBIR/Topics file"
+                    })
+            else:
+                opportunities = self._process_generic_csv(csv_path)
+                if progress_callback:
+                    progress_callback({
+                        "status": "processing",
+                        "stage": "debug",
+                        "message": f"Processing as generic CSV file"
+                    })
+            
+            total_opportunities = len(opportunities)
+            
+            # Send progress for parsing complete
+            if progress_callback:
+                progress_callback({
+                    "status": "processing",
+                    "stage": "parsing_complete",
+                    "message": f"Found {total_opportunities} opportunities",
+                    "total": total_opportunities
+                })
+            
+            # Debug: log if no opportunities found
+            if total_opportunities == 0:
+                if progress_callback:
+                    progress_callback({
+                        "status": "processing",
+                        "stage": "warning",
+                        "message": "No opportunities found in CSV file"
+                    })
+                return summary
+            
+            # Process opportunities with progress tracking
+            processed = 0
+            batch_data = []
+            batch_size = 5  # Smaller batch size for better progress tracking and rate limiting
+            
+            # Debug first opportunity
+            if opportunities and progress_callback:
+                first_opp = opportunities[0]
+                progress_callback({
+                    "status": "processing",
+                    "stage": "debug",
+                    "message": f"First opportunity: {first_opp.get('title', 'No title')[:50]}"
+                })
+                progress_callback({
+                    "status": "processing",
+                    "stage": "debug", 
+                    "message": f"Close date: {first_opp.get('close_date', 'No date')}"
+                })
+            
+            for i, opp in enumerate(opportunities):
+                # Check if expired
+                is_expired, exp_date = self._is_expired(opp)
+                
+                if is_expired:
+                    summary["expired_skipped"] += 1
+                    processed += 1
+                    summary["unprocessed"].append({
+                        "title": opp.get('title', 'Unknown'),
+                        "agency": opp.get('agency', 'Unknown'),
+                        "reason": f"Expired on {exp_date.strftime('%Y-%m-%d') if exp_date else 'unknown date'}"
+                    })
+                    if progress_callback and i < 5:  # Log first 5 for debugging
+                        progress_callback({
+                            "status": "processing",
+                            "stage": "debug",
+                            "message": f"Skipped expired: {opp.get('title', 'Unknown')[:50]}..."
+                        })
+                    continue
+                
+                # Generate unique ID
+                opp_id = self._generate_opportunity_id(opp)
+                
+                # Check if already processed
+                if opp_id in self.processed_ids["opportunities"]:
+                    existing = self.processed_ids["opportunities"][opp_id]
+                    
+                    # Log duplicate info for debugging
+                    summary["duplicate_skipped"] += 1
+                    processed += 1
+                    
+                    # Build detailed reason with existing opportunity info
+                    reason = f"Already processed (duplicate of '{existing.get('title', 'Unknown')[:50]}...' from {existing.get('file', 'unknown file')})"
+                    if existing.get('topic_number'):
+                        reason += f" [Topic: {existing.get('topic_number')}]"
+                    
+                    summary["unprocessed"].append({
+                        "title": opp.get('title', 'Unknown'),
+                        "agency": opp.get('agency', 'Unknown'),
+                        "reason": reason
+                    })
+                    
+                    if progress_callback and i < 5:  # Log first 5 for debugging
+                        progress_callback({
+                            "status": "processing", 
+                            "stage": "debug",
+                            "message": f"Skipped duplicate: {opp.get('title', 'Unknown')[:50]}... (matches existing: {existing.get('title', 'Unknown')[:50]}...)"
+                        })
+                    continue
+                
+                # Enrich with URL content if available
+                enriched_opp = self._enrich_opportunity_with_url(opp)
+                
+                # Add to batch
+                batch_data.append({
+                    "id": opp_id,
+                    "opportunity": enriched_opp,
+                    "expiration_date": exp_date
+                })
+                
+                # Process batch when full or at end
+                if len(batch_data) >= batch_size or (i == len(opportunities) - 1 and batch_data):
+                    if progress_callback:
+                        progress_callback({
+                            "status": "processing",
+                            "stage": "embeddings",
+                            "message": f"Generating embeddings ({processed}/{total_opportunities})",
+                            "current": processed,
+                            "total": total_opportunities
+                        })
+                    
+                    # Generate embeddings and store
+                    try:
+                        # Extract text for embeddings
+                        texts = []
+                        for item in batch_data:
+                            opp = item["opportunity"]
+                            text = f"{opp.get('title', '')} {opp.get('description', '')} {opp.get('agency', '')}"
+                            if 'keywords' in opp:
+                                text += f" {opp.get('keywords', '')}"
+                            texts.append(text)
+                        
+                        if progress_callback:
+                            progress_callback({
+                                "status": "processing",
+                                "stage": "debug",
+                                "message": f"Batch has {len(batch_data)} items, generating embeddings..."
+                            })
+                        
+                        # Get embeddings
+                        embeddings = self.embeddings_manager.generate_embeddings_batch(texts)
+                        
+                        # Add to vector database
+                        ids = []
+                        metadatas = []
+                        documents = []
+                        
+                        for i, item in enumerate(batch_data):
+                            opp = item["opportunity"]
+                            ids.append(item["id"])
+                            
+                            # Prepare metadata (ChromaDB has restrictions on metadata)
+                            metadata = {
+                                "title": str(opp.get("title", ""))[:100],  # Limit length
+                                "agency": str(opp.get("agency", "")),
+                                "deadline": str(opp.get("close_date", "")),
+                                "url": str(opp.get("url", "")),
+                                "program": str(opp.get("program", "")),
+                                "timestamp": datetime.now().isoformat()
+                            }
+                            metadatas.append(metadata)
+                            
+                            # Store full opportunity as JSON document
+                            documents.append(json.dumps(opp))
+                        
+                        # Batch upsert to ChromaDB
+                        self.vector_db.opportunities.upsert(
+                            ids=ids,
+                            embeddings=embeddings,
+                            metadatas=metadatas,
+                            documents=documents
+                        )
+                        
+                        # Track processed opportunities
+                        for item in batch_data:
+                            self.processed_ids["opportunities"][item["id"]] = {
+                                "file": filename,
+                                "title": item["opportunity"].get("title", "Unknown"),
+                                "agency": item["opportunity"].get("agency", "Unknown"),
+                                "topic_number": item["opportunity"].get("topic_number", "") or item["opportunity"].get("Topic Number", ""),
+                                "processed_at": datetime.now(timezone.utc).isoformat(),
+                                "expiration_date": item["expiration_date"].isoformat() if item["expiration_date"] else None
+                            }
+                            summary["new_opportunities"] += 1
+                        
+                        processed += len(batch_data)
+                        batch_data = []
+                        
+                        # Send progress update
+                        if progress_callback:
+                            progress_callback({
+                                "status": "processing",
+                                "stage": "storing",
+                                "message": f"Stored {processed}/{total_opportunities} opportunities",
+                                "current": processed,
+                                "total": total_opportunities
+                            })
+                        
+                    except Exception as e:
+                        import traceback
+                        error_detail = f"Batch processing error: {str(e)}\n{traceback.format_exc()}"
+                        summary["errors"].append(error_detail)
+                        print(f"ERROR in batch processing: {error_detail}")
+                        
+                        # Track unprocessed opportunities from this batch
+                        for item in batch_data:
+                            summary["unprocessed"].append({
+                                "title": item["opportunity"].get('title', 'Unknown'),
+                                "agency": item["opportunity"].get('agency', 'Unknown'),
+                                "reason": f"Processing error: {str(e)[:100]}"
+                            })
+                        
+                        if progress_callback:
+                            progress_callback({
+                                "status": "processing",
+                                "stage": "error",
+                                "message": f"Error processing batch: {str(e)}",
+                                "current": processed,
+                                "total": total_opportunities
+                            })
+                        # Clear batch data on error
+                        processed += len(batch_data)
+                        batch_data = []
+            
+            # Save processed IDs
+            self._save_processed_ids()
+            
+            # Move file to ingested folder
+            ingested_path = self.ingested_dir / filename
+            csv_path.rename(ingested_path)
+            
+            # Send completion
+            if progress_callback:
+                progress_callback({
+                    "status": "processing",
+                    "stage": "complete",
+                    "message": f"Successfully processed {filename}",
+                    "summary": summary
+                })
+            
+        except Exception as e:
+            summary["errors"].append(str(e))
+            if progress_callback:
+                progress_callback({
+                    "status": "error",
+                    "error": str(e),
+                    "message": f"Failed to process {filename}"
+                })
         
         return summary
     
@@ -385,7 +771,9 @@ class FundingOpportunitiesManager:
                 
                 # Track as processed
                 self.processed_ids["opportunities"][opp_id] = {
-                    "title": opp['title'],
+                    "title": opp.get('title', 'Unknown'),
+                    "agency": opp.get('agency', 'Unknown'),
+                    "topic_number": opp.get('topic_number', '') or opp.get('Topic Number', ''),
                     "processed_date": datetime.now().isoformat(),
                     "expiration_date": exp_date.isoformat() if exp_date else None
                 }

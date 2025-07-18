@@ -58,6 +58,7 @@ const UserProfile: React.FC = () => {
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [editFiles, setEditFiles] = useState<UploadedFile[]>([]);
   const [editUrls, setEditUrls] = useState<string[]>(['']);
+  const [isEditDragging, setIsEditDragging] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -352,6 +353,7 @@ const UserProfile: React.FC = () => {
     setEditingUserId(null);
     setEditFiles([]);
     setEditUrls(['']);
+    setIsEditDragging(false);
   };
 
   const uploadEditFile = async (file: File) => {
@@ -388,6 +390,36 @@ const UserProfile: React.FC = () => {
     if (selectedFiles) {
       for (let i = 0; i < selectedFiles.length; i++) {
         await uploadEditFile(selectedFiles[i]);
+      }
+    }
+  };
+
+  const handleEditDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsEditDragging(true);
+  };
+
+  const handleEditDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsEditDragging(false);
+  };
+
+  const handleEditDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleEditDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsEditDragging(false);
+
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    for (const file of droppedFiles) {
+      if (file.name.endsWith('.pdf') || file.name.endsWith('.json')) {
+        await uploadEditFile(file);
       }
     }
   };
@@ -570,18 +602,22 @@ const UserProfile: React.FC = () => {
                       <div className="mb-4">
                         <div
                           className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
-                            isDragging
+                            isEditDragging
                               ? 'border-indigo-500 bg-indigo-100'
                               : 'border-gray-300 hover:border-gray-400'
                           }`}
+                          onDragEnter={handleEditDragEnter}
+                          onDragLeave={handleEditDragLeave}
+                          onDragOver={handleEditDragOver}
+                          onDrop={handleEditDrop}
                         >
                           <Upload className="mx-auto h-8 w-8 text-gray-400" />
                           <p className="mt-1 text-xs text-gray-600">
-                            Drag and drop PDF files here, or click to select
+                            Drag and drop PDF or JSON files here, or click to select
                           </p>
                           <input
                             type="file"
-                            accept=".pdf"
+                            accept=".pdf,.json"
                             multiple
                             onChange={handleEditFileSelect}
                             className="hidden"
@@ -936,12 +972,37 @@ const UserProfile: React.FC = () => {
       <div className="bg-blue-50 rounded-lg p-6">
         <h4 className="text-sm font-semibold text-blue-900 mb-2">Tips for Best Results</h4>
         <ul className="text-sm text-blue-800 space-y-1">
-          <li>• Upload your most recent CV or resume</li>
+          <li>• Upload your most recent CV or resume (PDF format)</li>
           <li>• Include successful grant proposals if available</li>
           <li>• Add links to your faculty profile and Google Scholar</li>
           <li>• Provide detailed research interests for better matching</li>
           <li>• Include any research papers that showcase your expertise</li>
+          <li>• <strong>JSON Profile:</strong> Upload a JSON file for bulk URL processing (see example: input_documents/alfredo_costilla_reyes.json)</li>
         </ul>
+        <details className="mt-3">
+          <summary className="text-sm font-semibold text-blue-900 cursor-pointer">JSON Profile Format</summary>
+          <pre className="mt-2 text-xs bg-white p-3 rounded overflow-x-auto">{`{
+  "person": {
+    "name": "Your Name",
+    "summary": "Brief bio",
+    "links": [
+      {
+        "url": "https://example.com/profile",
+        "type": "faculty_profile"
+      },
+      {
+        "url": "https://scholar.google.com/...",
+        "type": "academic_profile"
+      }
+    ],
+    "biographical_information": {
+      "research_interests": ["AI", "ML"],
+      "education": [...],
+      "awards": [...]
+    }
+  }
+}`}</pre>
+        </details>
       </div>
     </div>
   );
