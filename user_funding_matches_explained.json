@@ -1,0 +1,229 @@
+{
+  "user": {
+    "name": "Alfredo Costilla-Reyes",
+    "research_interests": [
+      "Biomedical Engineering",
+      "Wearable Sensors",
+      "Wearable Devices",
+      "Electrical Engineering",
+      "VLSI",
+      "Remote Sensing",
+      "Remote Asset Monitoring",
+      "Microcontrollers",
+      "Microelectronics",
+      "Time-series data analysis"
+    ]
+  },
+  "original_matches": 15,
+  "explained_opportunities": [
+    {
+      "title": "EPSCoR Research Infrastructure Improvement Program: EPSCoR Research Incubators for STEM Excellence (E-RISE)",
+      "agency": "NSF",
+      "description": "The Established Program to Stimulate Competitive Research (EPSCoR) supports the mission of the U.S. National Science Foundation (NSF) by promoting nationwide scientific progress. Through this program,...",
+      "keywords": [
+        "Past",
+        "Program events",
+        "View guidelines",
+        "Program contacts",
+        "Updates to NSF Research Security Policies"
+      ],
+      "deadline": "2025-08-12, 2025-08-12",
+      "url": "https://www.nsf.gov/funding/opportunities/e-rise-epscor-research-infrastructure-improvement-program-epscor/nsf25-522",
+      "confidence_score": 21.8,
+      "similarity_score": 0.218,
+      "rag_explanation": {
+        "match_explanation": "The NSF EPSCoR E-RISE program aims to bolster research infrastructure, aligning with Alfredo's experience in developing and commercializing technologies related to wearable sensors, remote asset monitoring, and AI-powered solutions. His expertise in microelectronics, VLSI, and time-series data analysis, coupled with his entrepreneurial background, makes him a strong candidate to contribute to and benefit from the E-RISE program's goals of fostering scientific progress and innovation.",
+        "reusable_content": [
+          {
+            "document": "NSF22_PFI_OutlierDetection_RemoteAssetMonitoring.pdf",
+            "how_to_reuse": "This proposal directly addresses remote asset monitoring, a key interest of Alfredo's, and can be adapted to highlight its relevance to the E-RISE program's focus on strengthening research infrastructure within a specific state or region. The core concepts, methodology, and preliminary results could be repurposed to demonstrate the potential impact of his research on regional economic development and scientific advancement."
+          },
+          {
+            "document": "CV PI Alfredo Costilla Reyes 04-2025.pdf",
+            "how_to_reuse": "This document provides a comprehensive overview of Alfredo's expertise, awards, and experience. It should be included as part of the application to showcase his qualifications and leadership abilities. The CV highlights his innovation award and entrepreneurial ventures, demonstrating his potential to contribute to the E-RISE program's objectives."
+          },
+          {
+            "document": "COSTILLAREYES-DISSERTATION-2020.pdf",
+            "how_to_reuse": "Alfredo's dissertation may contain relevant theoretical background, methodologies, or preliminary findings related to his areas of expertise. Specific sections on sensor design, data analysis, or system integration could be extracted and adapted to support the technical aspects of the E-RISE proposal, demonstrating a solid foundation for the proposed research."
+          }
+        ],
+        "next_steps": [
+          "**Review the E-RISE program solicitation (NSF25-522) thoroughly:** Pay close attention to the specific requirements, eligibility criteria, evaluation criteria, and priorities of the program. Understand what the NSF is looking for in an E-RISE proposal.",
+          "**Identify the relevant EPSCoR jurisdiction and potential collaborators:** The E-RISE program supports research infrastructure improvement within specific EPSCoR jurisdictions. Alfredo needs to identify the relevant state or territory and explore potential collaborations with researchers and institutions within that jurisdiction. Building partnerships is crucial for a successful E-RISE proposal.",
+          "**Develop a compelling project proposal that aligns with the E-RISE program's goals:** Based on his research interests and the program's requirements, Alfredo should develop a project proposal that addresses a specific need within the EPSCoR jurisdiction. The proposal should clearly articulate the project's objectives, methodology, expected outcomes, and potential impact on the region's research infrastructure and economic development. Leverage reusable content from his existing proposals and dissertation to strengthen the proposal."
+        ],
+        "raw_explanation": "MATCH EXPLANATION:\nThe NSF EPSCoR E-RISE program aims to bolster research infrastructure, aligning with Alfredo's experience in developing and commercializing technologies related to wearable sensors, remote asset monitoring, and AI-powered solutions. His expertise in microelectronics, VLSI, and time-series data analysis, coupled with his entrepreneurial background, makes him a strong candidate to contribute to and benefit from the E-RISE program's goals of fostering scientific progress and innovation.\n\nREUSABLE CONTENT:\n- NSF22_PFI_OutlierDetection_RemoteAssetMonitoring.pdf: This proposal directly addresses remote asset monitoring, a key interest of Alfredo's, and can be adapted to highlight its relevance to the E-RISE program's focus on strengthening research infrastructure within a specific state or region. The core concepts, methodology, and preliminary results could be repurposed to demonstrate the potential impact of his research on regional economic development and scientific advancement.\n- CV PI Alfredo Costilla Reyes 04-2025.pdf: This document provides a comprehensive overview of Alfredo's expertise, awards, and experience. It should be included as part of the application to showcase his qualifications and leadership abilities. The CV highlights his innovation award and entrepreneurial ventures, demonstrating his potential to contribute to the E-RISE program's objectives.\n- COSTILLAREYES-DISSERTATION-2020.pdf: Alfredo's dissertation may contain relevant theoretical background, methodologies, or preliminary findings related to his areas of expertise. Specific sections on sensor design, data analysis, or system integration could be extracted and adapted to support the technical aspects of the E-RISE proposal, demonstrating a solid foundation for the proposed research.\n\nNEXT STEPS:\n1. **Review the E-RISE program solicitation (NSF25-522) thoroughly:** Pay close attention to the specific requirements, eligibility criteria, evaluation criteria, and priorities of the program. Understand what the NSF is looking for in an E-RISE proposal.\n2. **Identify the relevant EPSCoR jurisdiction and potential collaborators:** The E-RISE program supports research infrastructure improvement within specific EPSCoR jurisdictions. Alfredo needs to identify the relevant state or territory and explore potential collaborations with researchers and institutions within that jurisdiction. Building partnerships is crucial for a successful E-RISE proposal.\n3. **Develop a compelling project proposal that aligns with the E-RISE program's goals:** Based on his research interests and the program's requirements, Alfredo should develop a project proposal that addresses a specific need within the EPSCoR jurisdiction. The proposal should clearly articulate the project's objectives, methodology, expected outcomes, and potential impact on the region's research infrastructure and economic development. Leverage reusable content from his existing proposals and dissertation to strengthen the proposal.\n"
+      }
+    },
+    {
+      "title": "Verticals-enabling Intelligent Network Systems (VINES)",
+      "agency": "NSF",
+      "description": "The VINES program seeks to support both fundamental research and verticals-driven technology development, demonstration, and translation activities that will lead to leaps in performance and capabilit...",
+      "keywords": [
+        "VINES informational webinar resources",
+        "Important information for proposers",
+        "View guidelines",
+        "Updates and announcements",
+        "Synopsis"
+      ],
+      "deadline": "2025-08-25, 2025-08-25",
+      "url": "https://www.nsf.gov/funding/opportunities/vines-verticals-enabling-intelligent-network-systems/nsf25-539",
+      "confidence_score": 20.2,
+      "similarity_score": 0.202,
+      "rag_explanation": {
+        "match_explanation": "The NSF VINES program aligns well with Alfredo's research interests in biomedical engineering, wearable sensors, remote asset monitoring, and time-series data analysis. His experience with AI-powered solutions for manufacturing defect detection using edge computing also fits the program's focus on verticals-driven technology development and intelligent network systems.",
+        "reusable_content": [
+          {
+            "document": "NSF22_PFI_OutlierDetection_RemoteAssetMonitoring.pdf",
+            "how_to_reuse": "This proposal focuses on remote asset monitoring which is directly relevant to the VINES program. Alfredo can adapt the problem statement, methodology, and preliminary results from this proposal to address the VINES program's emphasis on intelligent network systems for specific applications."
+          },
+          {
+            "document": "CV PI Alfredo Costilla Reyes 04-2025.pdf",
+            "how_to_reuse": "This document can be used to showcase Alfredo's expertise in relevant areas such as VLSI, microcontrollers, and microelectronics, strengthening the credibility of the proposal. The awards and travel grants listed can also demonstrate Alfredo's entrepreneurial drive and commitment to innovation."
+          },
+          {
+            "document": "A Time-Interleave-Based Power Management System with Maximum Power Extraction and Health Protection Algorithm for Multip.pdf",
+            "how_to_reuse": "This research paper demonstrates Alfredo's expertise in power management for wearable devices, which is crucial for developing sustainable and efficient intelligent network systems. He can cite this work to showcase his understanding of the hardware aspects of wearable technology."
+          }
+        ],
+        "next_steps": [
+          "**Review the VINES program solicitation thoroughly:** Carefully read the NSF's program guidelines and any associated FAQs or webinar materials to understand the specific requirements, priorities, and evaluation criteria for VINES proposals.",
+          "**Develop a concept paper/project summary:** Outline a specific project idea that leverages Alfredo's expertise in wearable sensors, remote asset monitoring, and AI-powered edge computing, and aligns with a relevant vertical (e.g., healthcare, manufacturing, agriculture). This should include a clear problem statement, proposed solution, and expected impact.",
+          "**Contact the NSF program officer:** Reach out to the VINES program officer to discuss the project idea and get feedback on its suitability for the program. This can help refine the proposal and increase its chances of success."
+        ],
+        "raw_explanation": "MATCH EXPLANATION:\nThe NSF VINES program aligns well with Alfredo's research interests in biomedical engineering, wearable sensors, remote asset monitoring, and time-series data analysis. His experience with AI-powered solutions for manufacturing defect detection using edge computing also fits the program's focus on verticals-driven technology development and intelligent network systems.\n\nREUSABLE CONTENT:\n- NSF22_PFI_OutlierDetection_RemoteAssetMonitoring.pdf: This proposal focuses on remote asset monitoring which is directly relevant to the VINES program. Alfredo can adapt the problem statement, methodology, and preliminary results from this proposal to address the VINES program's emphasis on intelligent network systems for specific applications.\n- CV PI Alfredo Costilla Reyes 04-2025.pdf: This document can be used to showcase Alfredo's expertise in relevant areas such as VLSI, microcontrollers, and microelectronics, strengthening the credibility of the proposal. The awards and travel grants listed can also demonstrate Alfredo's entrepreneurial drive and commitment to innovation.\n- A Time-Interleave-Based Power Management System with Maximum Power Extraction and Health Protection Algorithm for Multip.pdf: This research paper demonstrates Alfredo's expertise in power management for wearable devices, which is crucial for developing sustainable and efficient intelligent network systems. He can cite this work to showcase his understanding of the hardware aspects of wearable technology.\n\nNEXT STEPS:\n1. **Review the VINES program solicitation thoroughly:** Carefully read the NSF's program guidelines and any associated FAQs or webinar materials to understand the specific requirements, priorities, and evaluation criteria for VINES proposals.\n2. **Develop a concept paper/project summary:** Outline a specific project idea that leverages Alfredo's expertise in wearable sensors, remote asset monitoring, and AI-powered edge computing, and aligns with a relevant vertical (e.g., healthcare, manufacturing, agriculture). This should include a clear problem statement, proposed solution, and expected impact.\n3. **Contact the NSF program officer:** Reach out to the VINES program officer to discuss the project idea and get feedback on its suitability for the program. This can help refine the proposal and increase its chances of success.\n"
+      }
+    },
+    {
+      "title": "National Science Foundation Translation to Practice (NSF TTP)",
+      "agency": "NSF",
+      "description": "The U.S. NSF Directorate for Technology, Innovation and Partnerships (NSF TIP) partners across sectors to advance three primary focus areas \u2013 accelerating technology translation and development, foste...",
+      "keywords": [
+        "Important information for proposers",
+        "View guidelines",
+        "Synopsis",
+        "Organization(s)",
+        "Updates to NSF Research Security Policies"
+      ],
+      "deadline": "2025-09-16, 2025-09-16",
+      "url": "https://www.nsf.gov/funding/opportunities/nsf-ttp-national-science-foundation-translation-practice/nsf25-540",
+      "confidence_score": 19.3,
+      "similarity_score": 0.193,
+      "rag_explanation": {
+        "match_explanation": "The NSF Translation to Practice (TTP) program is an excellent match for Alfredo's profile because it focuses on accelerating technology translation and development, which aligns perfectly with his experience in co-founding AI POW LLC and AutoEdge, his work on wearable sensors and remote asset monitoring, and his history of securing innovation awards and travel grants related to entrepreneurship. His expertise in biomedical engineering, VLSI, microcontrollers, and time-series data analysis, coupled with his startup experience, positions him well to propose a project that translates research into practical applications.",
+        "reusable_content": [
+          {
+            "document": "NSF22_PFI_OutlierDetection_RemoteAssetMonitoring.pdf",
+            "how_to_reuse": "This proposal directly aligns with the TTP program's focus on translating research into practice. The \"Outlier Detection for Remote Asset Monitoring\" project can be further developed and adapted to demonstrate commercial potential and impact."
+          },
+          {
+            "document": "NSF21_SBIR_AutoML_OnDeviceAI.pdf",
+            "how_to_reuse": "These SBIR proposals on AutoML and On-Device AI demonstrate a track record of seeking and securing funding from NSF for similar technology translation projects. They can be used as a template for structuring the TTP proposal and highlighting the potential for commercialization."
+          },
+          {
+            "document": "CV PI Alfredo Costilla Reyes 04-2025.pdf",
+            "how_to_reuse": "This CV can be used to demonstrate Alfredo's expertise and experience in the relevant fields, highlighting his awards, entrepreneurial experience, and publications."
+          },
+          {
+            "document": "COSTILLAREYES-DISSERTATION-2020.pdf",
+            "how_to_reuse": "This dissertation likely contains foundational research relevant to his current projects. Specific sections related to sensor technology, data analysis, or hardware design could be extracted and used to support the technical feasibility of the proposed TTP project."
+          }
+        ],
+        "next_steps": [
+          "**Review the NSF TTP program solicitation (NSF25-540) in detail.** Pay close attention to the eligibility requirements, proposal format, and evaluation criteria. Understand the specific focus areas of the program and identify how your project aligns with those areas.",
+          "**Develop a strong commercialization plan.** The TTP program emphasizes the translation of research into practical applications. Therefore, a well-defined plan that outlines the market opportunity, target customers, competitive landscape, and revenue model is crucial. This plan should build upon the work outlined in previous proposals and address any feedback received.",
+          "**Contact the NSF Program Officer for the TTP program.** Discuss your project idea with the program officer to get feedback and ensure that it is a good fit for the program. This can help you refine your proposal and increase your chances of success."
+        ],
+        "raw_explanation": "MATCH EXPLANATION:\nThe NSF Translation to Practice (TTP) program is an excellent match for Alfredo's profile because it focuses on accelerating technology translation and development, which aligns perfectly with his experience in co-founding AI POW LLC and AutoEdge, his work on wearable sensors and remote asset monitoring, and his history of securing innovation awards and travel grants related to entrepreneurship. His expertise in biomedical engineering, VLSI, microcontrollers, and time-series data analysis, coupled with his startup experience, positions him well to propose a project that translates research into practical applications.\n\nREUSABLE CONTENT:\n- NSF22_PFI_OutlierDetection_RemoteAssetMonitoring.pdf: This proposal directly aligns with the TTP program's focus on translating research into practice. The \"Outlier Detection for Remote Asset Monitoring\" project can be further developed and adapted to demonstrate commercial potential and impact.\n- NSF21_SBIR_AutoML_OnDeviceAI.pdf & NSF22_SBIR_ph2_AutoML_OnDeviceAI.pdf: These SBIR proposals on AutoML and On-Device AI demonstrate a track record of seeking and securing funding from NSF for similar technology translation projects. They can be used as a template for structuring the TTP proposal and highlighting the potential for commercialization.\n- CV PI Alfredo Costilla Reyes 04-2025.pdf: This CV can be used to demonstrate Alfredo's expertise and experience in the relevant fields, highlighting his awards, entrepreneurial experience, and publications.\n- COSTILLAREYES-DISSERTATION-2020.pdf: This dissertation likely contains foundational research relevant to his current projects. Specific sections related to sensor technology, data analysis, or hardware design could be extracted and used to support the technical feasibility of the proposed TTP project.\n\nNEXT STEPS:\n1. **Review the NSF TTP program solicitation (NSF25-540) in detail.** Pay close attention to the eligibility requirements, proposal format, and evaluation criteria. Understand the specific focus areas of the program and identify how your project aligns with those areas.\n2. **Develop a strong commercialization plan.** The TTP program emphasizes the translation of research into practical applications. Therefore, a well-defined plan that outlines the market opportunity, target customers, competitive landscape, and revenue model is crucial. This plan should build upon the work outlined in previous proposals and address any feedback received.\n3. **Contact the NSF Program Officer for the TTP program.** Discuss your project idea with the program officer to get feedback and ensure that it is a good fit for the program. This can help you refine your proposal and increase your chances of success.\n"
+      }
+    },
+    {
+      "title": "Advancing Research on Alzheimer's Disease (AD) and AD-Related Dementias (ADRD) (R41/R42 Clinical Trial Optional)",
+      "agency": "HHS",
+      "description": "Recommendations and milestones for Alzheimer's disease (AD) and AD-related dementias (ADRD) research from the National Alzheimer\u2019s Project Act and, the 2015, 2018, 2019, and 2021 Alzheimer's Disease R...",
+      "keywords": [
+        "Section VII. Agency Contacts",
+        "Section III. Eligibility Information",
+        "Part 1. Overview Information",
+        "Section V. Application Review Information",
+        "Section II. Award Information"
+      ],
+      "deadline": "September 6, 2025",
+      "url": "https://grants.nih.gov/grants/guide/PA-files/PAS-22-197.html",
+      "confidence_score": 18.3,
+      "similarity_score": 0.183,
+      "rag_explanation": {
+        "match_explanation": "This funding opportunity aligns well with Alfredo's expertise in wearable sensors, remote asset monitoring, and time-series data analysis, as these technologies can be applied to develop innovative solutions for early detection, monitoring, and management of AD and ADRD. Furthermore, his experience with AI POW LLC and AutoEdge, focused on AI-driven solutions, could be leveraged to create intelligent wearable devices for AD/ADRD patients.",
+        "reusable_content": [
+          {
+            "document": "NSF22_PFI_OutlierDetection_RemoteAssetMonitoring.pdf",
+            "how_to_reuse": "The concepts and methodologies for remote asset monitoring and outlier detection could be adapted to monitor AD/ADRD patients remotely, detecting anomalies in their behavior or physiological data that could indicate disease progression or other health concerns."
+          },
+          {
+            "document": "CV PI Alfredo Costilla Reyes 04-2025.pdf",
+            "how_to_reuse": "Use this document to highlight Alfredo's expertise in biomedical engineering, wearable sensors, and AI, as well as his awards and entrepreneurial experience, to demonstrate his qualifications for leading this project."
+          },
+          {
+            "document": "COSTILLAREYES-DISSERTATION-2020.pdf",
+            "how_to_reuse": "Alfredo's dissertation could provide foundational knowledge and research methodologies relevant to developing novel sensor technologies or data analysis techniques for AD/ADRD applications."
+          }
+        ],
+        "next_steps": [
+          "**Thoroughly review the funding opportunity announcement (FOA):** Carefully read PAS-22-197 to understand the specific research priorities, eligibility criteria, and application requirements for the R41/R42 mechanism. Pay close attention to the milestones and recommendations for AD/ADRD research outlined in the announcement.",
+          "**Develop a concept paper/pre-proposal:** Based on the FOA and Alfredo's expertise, create a brief concept paper outlining a specific research project focusing on wearable sensor technology for AD/ADRD. Consider focusing on early detection, continuous monitoring, or personalized interventions. This concept paper should be tailored to the goals of this funding opportunity.",
+          "**Contact relevant program officers at NIH:** Reach out to the program officers listed in Section VII of the FOA to discuss the concept paper and get feedback on its suitability for the funding opportunity. This will allow Alfredo to refine his project proposal and increase his chances of success."
+        ],
+        "raw_explanation": "MATCH EXPLANATION:\nThis funding opportunity aligns well with Alfredo's expertise in wearable sensors, remote asset monitoring, and time-series data analysis, as these technologies can be applied to develop innovative solutions for early detection, monitoring, and management of AD and ADRD. Furthermore, his experience with AI POW LLC and AutoEdge, focused on AI-driven solutions, could be leveraged to create intelligent wearable devices for AD/ADRD patients.\n\nREUSABLE CONTENT:\n- NSF22_PFI_OutlierDetection_RemoteAssetMonitoring.pdf: The concepts and methodologies for remote asset monitoring and outlier detection could be adapted to monitor AD/ADRD patients remotely, detecting anomalies in their behavior or physiological data that could indicate disease progression or other health concerns.\n- CV PI Alfredo Costilla Reyes 04-2025.pdf: Use this document to highlight Alfredo's expertise in biomedical engineering, wearable sensors, and AI, as well as his awards and entrepreneurial experience, to demonstrate his qualifications for leading this project.\n- COSTILLAREYES-DISSERTATION-2020.pdf: Alfredo's dissertation could provide foundational knowledge and research methodologies relevant to developing novel sensor technologies or data analysis techniques for AD/ADRD applications.\n\nNEXT STEPS:\n1. **Thoroughly review the funding opportunity announcement (FOA):** Carefully read PAS-22-197 to understand the specific research priorities, eligibility criteria, and application requirements for the R41/R42 mechanism. Pay close attention to the milestones and recommendations for AD/ADRD research outlined in the announcement.\n2. **Develop a concept paper/pre-proposal:** Based on the FOA and Alfredo's expertise, create a brief concept paper outlining a specific research project focusing on wearable sensor technology for AD/ADRD. Consider focusing on early detection, continuous monitoring, or personalized interventions. This concept paper should be tailored to the goals of this funding opportunity.\n3. **Contact relevant program officers at NIH:** Reach out to the program officers listed in Section VII of the FOA to discuss the concept paper and get feedback on its suitability for the funding opportunity. This will allow Alfredo to refine his project proposal and increase his chances of success.\n"
+      }
+    },
+    {
+      "title": "NSF/CASIS Transport Phenomena Research at the International Space Station to Benefit Life on Earth",
+      "agency": "NSF",
+      "description": "The Division of Chemical, Bioengineering, Environmental, and Transport Systems (CBET) and the Division of Civil, Mechanical, and Manufacturing innovation (CMMI) in the Engineering Directorate (ENG) an...",
+      "keywords": [
+        "View guidelines",
+        "Program contacts",
+        "Organization(s)",
+        "Updates to NSF Research Security Policies",
+        "Synopsis"
+      ],
+      "deadline": "",
+      "url": "https://www.nsf.gov/funding/opportunities/nsfcasis-transport-phenomena-research-international-space/nsf25-529",
+      "confidence_score": 18.3,
+      "similarity_score": 0.183,
+      "rag_explanation": {
+        "match_explanation": "This NSF/CASIS opportunity is a good match for Alfredo Costilla-Reyes because his expertise in wearable sensors, remote sensing, and time-series data analysis can be applied to studying transport phenomena in the unique environment of the International Space Station. The focus on benefiting life on Earth also aligns with his interest in real-world applications and his work on remote asset monitoring and defect detection.",
+        "reusable_content": [
+          {
+            "document": "NSF22_PFI_OutlierDetection_RemoteAssetMonitoring.pdf",
+            "how_to_reuse": "The remote asset monitoring proposal could be adapted to propose using wearable sensors and remote sensing techniques to monitor transport phenomena experiments on the ISS. This proposal's focus on data analysis and algorithm development for remote data streams is directly applicable."
+          },
+          {
+            "document": "CV PI Alfredo Costilla Reyes 04-2025.pdf",
+            "how_to_reuse": "This document can be used to showcase Alfredo's expertise in biomedical engineering, wearable sensors, and VLSI, highlighting his qualifications for leading a project focused on developing and implementing sensor-based solutions for studying transport phenomena in space."
+          },
+          {
+            "document": "COSTILLAREYES-DISSERTATION-2020.pdf",
+            "how_to_reuse": "The dissertation likely contains foundational research related to sensor design, data acquisition, and analysis, which can be cited and adapted to support the proposed methodology for the ISS experiment."
+          }
+        ],
+        "next_steps": [
+          "**Thoroughly Review the Full Program Solicitation:** Carefully read the entire NSF/CASIS Transport Phenomena Research at the International Space Station to Benefit Life on Earth (NSF25-529) solicitation to fully understand the program's specific goals, eligibility requirements, review criteria, and submission guidelines.",
+          "**Identify Specific Transport Phenomena to Study:** Based on his expertise and the program's priorities, Alfredo should identify specific transport phenomena that can be effectively studied using wearable sensors and remote sensing technologies on the ISS. Consider phenomena relevant to biomedical engineering or remote asset monitoring, bridging his existing work with the space-based research environment.",
+          "**Develop a Preliminary Research Plan and Contact the Program Officer:** Outline a preliminary research plan, including the specific sensors to be used, the data analysis methods, and the expected outcomes. Contact the program officer listed in the solicitation to discuss the feasibility of the proposed research and obtain feedback on the alignment with the program's goals."
+        ],
+        "raw_explanation": "MATCH EXPLANATION:\nThis NSF/CASIS opportunity is a good match for Alfredo Costilla-Reyes because his expertise in wearable sensors, remote sensing, and time-series data analysis can be applied to studying transport phenomena in the unique environment of the International Space Station. The focus on benefiting life on Earth also aligns with his interest in real-world applications and his work on remote asset monitoring and defect detection.\n\nREUSABLE CONTENT:\n- NSF22_PFI_OutlierDetection_RemoteAssetMonitoring.pdf: The remote asset monitoring proposal could be adapted to propose using wearable sensors and remote sensing techniques to monitor transport phenomena experiments on the ISS. This proposal's focus on data analysis and algorithm development for remote data streams is directly applicable.\n- CV PI Alfredo Costilla Reyes 04-2025.pdf: This document can be used to showcase Alfredo's expertise in biomedical engineering, wearable sensors, and VLSI, highlighting his qualifications for leading a project focused on developing and implementing sensor-based solutions for studying transport phenomena in space.\n- COSTILLAREYES-DISSERTATION-2020.pdf: The dissertation likely contains foundational research related to sensor design, data acquisition, and analysis, which can be cited and adapted to support the proposed methodology for the ISS experiment.\n\nNEXT STEPS:\n1. **Thoroughly Review the Full Program Solicitation:** Carefully read the entire NSF/CASIS Transport Phenomena Research at the International Space Station to Benefit Life on Earth (NSF25-529) solicitation to fully understand the program's specific goals, eligibility requirements, review criteria, and submission guidelines.\n2. **Identify Specific Transport Phenomena to Study:** Based on his expertise and the program's priorities, Alfredo should identify specific transport phenomena that can be effectively studied using wearable sensors and remote sensing technologies on the ISS. Consider phenomena relevant to biomedical engineering or remote asset monitoring, bridging his existing work with the space-based research environment.\n3. **Develop a Preliminary Research Plan and Contact the Program Officer:** Outline a preliminary research plan, including the specific sensors to be used, the data analysis methods, and the expected outcomes. Contact the program officer listed in the solicitation to discuss the feasibility of the proposed research and obtain feedback on the alignment with the program's goals.\n"
+      }
+    }
+  ],
+  "generated_at": "2025-07-17T17:39:04.714511",
+  "documents_analyzed": [
+    "CV PI Alfredo Costilla Reyes 04-2025.pdf",
+    "COSTILLAREYES-DISSERTATION-2020.pdf",
+    "NSF21_SBIR_AutoML_OnDeviceAI.pdf",
+    "NSF22_SBIR_ph2_AutoML_OnDeviceAI.pdf",
+    "A Time-Interleave-Based Power Management System with Maximum Power Extraction and Health Protection Algorithm for Multip.pdf",
+    "AutoVideo.pdf",
+    "NSF22_PFI_OutlierDetection_RemoteAssetMonitoring.pdf"
+  ]
+}
