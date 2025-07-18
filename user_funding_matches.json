@@ -1,0 +1,242 @@
+{
+  "user": {
+    "name": "Alfredo Costilla-Reyes",
+    "research_interests": [
+      "Biomedical Engineering",
+      "Wearable Sensors",
+      "Wearable Devices",
+      "Electrical Engineering",
+      "VLSI",
+      "Remote Sensing",
+      "Remote Asset Monitoring",
+      "Microcontrollers",
+      "Microelectronics",
+      "Time-series data analysis"
+    ]
+  },
+  "matches": [
+    {
+      "title": "EPSCoR Research Infrastructure Improvement Program: EPSCoR Research Incubators for STEM Excellence (E-RISE)",
+      "agency": "NSF",
+      "description": "The Established Program to Stimulate Competitive Research (EPSCoR) supports the mission of the U.S. National Science Foundation (NSF) by promoting nationwide scientific progress. Through this program,...",
+      "keywords": [
+        "Past",
+        "Program events",
+        "View guidelines",
+        "Program contacts",
+        "Updates to NSF Research Security Policies"
+      ],
+      "deadline": "2025-08-12, 2025-08-12",
+      "url": "https://www.nsf.gov/funding/opportunities/e-rise-epscor-research-infrastructure-improvement-program-epscor/nsf25-522",
+      "confidence_score": 21.8,
+      "similarity_score": 0.218
+    },
+    {
+      "title": "Verticals-enabling Intelligent Network Systems (VINES)",
+      "agency": "NSF",
+      "description": "The VINES program seeks to support both fundamental research and verticals-driven technology development, demonstration, and translation activities that will lead to leaps in performance and capabilit...",
+      "keywords": [
+        "VINES informational webinar resources",
+        "Important information for proposers",
+        "View guidelines",
+        "Updates and announcements",
+        "Synopsis"
+      ],
+      "deadline": "2025-08-25, 2025-08-25",
+      "url": "https://www.nsf.gov/funding/opportunities/vines-verticals-enabling-intelligent-network-systems/nsf25-539",
+      "confidence_score": 20.2,
+      "similarity_score": 0.202
+    },
+    {
+      "title": "National Science Foundation Translation to Practice (NSF TTP)",
+      "agency": "NSF",
+      "description": "The U.S. NSF Directorate for Technology, Innovation and Partnerships (NSF TIP) partners across sectors to advance three primary focus areas \u2013 accelerating technology translation and development, foste...",
+      "keywords": [
+        "Important information for proposers",
+        "View guidelines",
+        "Synopsis",
+        "Organization(s)",
+        "Updates to NSF Research Security Policies"
+      ],
+      "deadline": "2025-09-16, 2025-09-16",
+      "url": "https://www.nsf.gov/funding/opportunities/nsf-ttp-national-science-foundation-translation-practice/nsf25-540",
+      "confidence_score": 19.3,
+      "similarity_score": 0.193
+    },
+    {
+      "title": "Advancing Research on Alzheimer's Disease (AD) and AD-Related Dementias (ADRD) (R41/R42 Clinical Trial Optional)",
+      "agency": "HHS",
+      "description": "Recommendations and milestones for Alzheimer's disease (AD) and AD-related dementias (ADRD) research from the National Alzheimer\u2019s Project Act and, the 2015, 2018, 2019, and 2021 Alzheimer's Disease R...",
+      "keywords": [
+        "Section VII. Agency Contacts",
+        "Section III. Eligibility Information",
+        "Part 1. Overview Information",
+        "Section V. Application Review Information",
+        "Section II. Award Information"
+      ],
+      "deadline": "September 6, 2025",
+      "url": "https://grants.nih.gov/grants/guide/PA-files/PAS-22-197.html",
+      "confidence_score": 18.3,
+      "similarity_score": 0.183
+    },
+    {
+      "title": "NSF/CASIS Transport Phenomena Research at the International Space Station to Benefit Life on Earth",
+      "agency": "NSF",
+      "description": "The Division of Chemical, Bioengineering, Environmental, and Transport Systems (CBET) and the Division of Civil, Mechanical, and Manufacturing innovation (CMMI) in the Engineering Directorate (ENG) an...",
+      "keywords": [
+        "View guidelines",
+        "Program contacts",
+        "Organization(s)",
+        "Updates to NSF Research Security Policies",
+        "Synopsis"
+      ],
+      "deadline": "",
+      "url": "https://www.nsf.gov/funding/opportunities/nsfcasis-transport-phenomena-research-international-space/nsf25-529",
+      "confidence_score": 18.3,
+      "similarity_score": 0.183
+    },
+    {
+      "title": "Translation and Diffusion (TD)",
+      "agency": "NSF",
+      "description": "This solicitation addresses issues of translation and diffusion that arise in moving knowledge gained from fundamental learning and education research toward application in PreK-12 STEM classroom prac...",
+      "keywords": [
+        "Translation and Diffusion (TD)",
+        "View guidelines",
+        "Program contacts",
+        "Organization(s)",
+        "Upcoming due dates"
+      ],
+      "deadline": "2026-02-04, 2026-02-04",
+      "url": "https://www.nsf.gov/funding/opportunities/td-translation-diffusion/nsf25-528",
+      "confidence_score": 17.9,
+      "similarity_score": 0.179
+    },
+    {
+      "title": "Launching Early-Career Academic Pathways in the Mathematical and Physical Sciences",
+      "agency": "NSF",
+      "description": "The Launching of Early-Career Academic Pathways in the Mathematical and Physical Sciences (LEAPS-MPS) supports the launch of the careers of pre-tenure faculty whose research is in Mathematical and Phy...",
+      "keywords": [
+        "Program events",
+        "View guidelines",
+        "Program contacts",
+        "Updates to NSF Research Security Policies",
+        "Synopsis"
+      ],
+      "deadline": "2026-01-22, 2026-01-22",
+      "url": "https://www.nsf.gov/funding/opportunities/launching-early-career-academic-pathways-mathematical/nsf25-535",
+      "confidence_score": 17.6,
+      "similarity_score": 0.176
+    },
+    {
+      "title": "Phase I Call for Innovative Defense-Related Dual-Purpose Technologies/Solutions with a Clear Air Force Stakeholder Need",
+      "agency": "DOD",
+      "description": "OUSD(R&E) Critical Technology Areas:   Advanced Computing and Software; Advanced Materials; Biotechnology; Directed Energy (DE); Energy Resilience; Future Generation Wireless Technology (FutureG); Hum...",
+      "keywords": [],
+      "deadline": "August 5, 2025",
+      "url": "https://www.dodsbirsttr.mil/submissions/solicitation-documents/active-solicitations",
+      "confidence_score": 17.5,
+      "similarity_score": 0.175
+    },
+    {
+      "title": "Phase I Call for Innovative Defense-Related Dual-Purpose Technologies/Solutions with a Clear Air Force Stakeholder Need",
+      "agency": "DOD",
+      "description": "OUSD(R&E) Critical Technology Areas:   Advanced Computing and Software; Advanced Materials; Biotechnology; Directed Energy (DE); Energy Resilience; Future Generation Wireless Technology (FutureG); Hum...",
+      "keywords": [],
+      "deadline": "August 5, 2025",
+      "url": "https://www.dodsbirsttr.mil/submissions/solicitation-documents/active-solicitations",
+      "confidence_score": 17.5,
+      "similarity_score": 0.175
+    },
+    {
+      "title": "Amplifying STEM Education Investments in and with Rural and Remote Areas and Communities",
+      "agency": "NSF",
+      "description": "...",
+      "keywords": [
+        "CONTACT",
+        "Organizations",
+        "PROPOSAL PREPARATION INSTRUCTIONS",
+        "Topics",
+        "Share"
+      ],
+      "deadline": "",
+      "url": "https://www.nsf.gov/funding/opportunities/dcl-amplifying-stem-education-investments-rural-remote-areas",
+      "confidence_score": 17.4,
+      "similarity_score": 0.174
+    },
+    {
+      "title": "Infrastructure Systems and People (ISP)",
+      "agency": "NSF",
+      "description": "Infrastructure systems comprise complex connections between physical components, organizational structures and operational methods that support the needs of people and communities at the local, region...",
+      "keywords": [
+        "Infrastructure Systems and People (ISP)",
+        "Organization(s)",
+        "Program contacts",
+        "Upcoming due dates",
+        "Updates to NSF Research Security Policies"
+      ],
+      "deadline": "",
+      "url": "https://www.nsf.gov/funding/opportunities/isp-infrastructure-systems-people/pd25-342y",
+      "confidence_score": 16.8,
+      "similarity_score": 0.168
+    },
+    {
+      "title": "Advancing Research on Alzheimer's Disease (AD) and AD-Related Dementias (ADRD) (R43/R44 Clinical Trial Optional)",
+      "agency": "HHS",
+      "description": "Recommendations and milestones for Alzheimer's disease (AD) and AD-related dementias (ADRD) research from the National Alzheimer\u2019s Project Act and the 2015, 2018, 2019, and 2021 Alzheimer's Disease Re...",
+      "keywords": [
+        "Section VII. Agency Contacts",
+        "Section III. Eligibility Information",
+        "Part 1. Overview Information",
+        "Section V. Application Review Information",
+        "Section II. Award Information"
+      ],
+      "deadline": "September 8, 2025",
+      "url": "https://grants.nih.gov/grants/guide/PA-files/PAS-22-196.html",
+      "confidence_score": 16.8,
+      "similarity_score": 0.168
+    },
+    {
+      "title": "The Research on Research Security Program (RoRS)",
+      "agency": "NSF",
+      "description": "NSF is committed to securing the nation's research enterprise as part of its core mission. The Research on Research Security (RoRS) program will advance the understanding of the full scope, potential,...",
+      "keywords": [
+        "Important information for proposers",
+        "The Research on Research Security Program (RoRS)",
+        "Synopsis",
+        "Organization(s)",
+        "Upcoming due dates"
+      ],
+      "deadline": "",
+      "url": "https://www.nsf.gov/funding/opportunities/rors-research-research-security-program/pd25-275y",
+      "confidence_score": 16.5,
+      "similarity_score": 0.165
+    },
+    {
+      "title": "Additive Manufacturing for Circuitry",
+      "agency": "DOD",
+      "description": "OUSD (R&E) CRITICAL TECHNOLOGY AREA(S): Advanced Computing and Software; Advanced Materials; Microelectronics      OBJECTIVE: This topic seeks to develop open-source machine controller software and cu...",
+      "keywords": [],
+      "deadline": "July 23, 2025",
+      "url": "https://www.dodsbirsttr.mil/submissions/solicitation-documents/active-solicitations",
+      "confidence_score": 16.5,
+      "similarity_score": 0.165
+    },
+    {
+      "title": "Additive Manufacturing for Circuitry",
+      "agency": "DOD",
+      "description": "OUSD (R&E) CRITICAL TECHNOLOGY AREA(S): Advanced Computing and Software; Advanced Materials; Microelectronics      OBJECTIVE: This topic seeks to develop open-source machine controller software and cu...",
+      "keywords": [],
+      "deadline": "July 23, 2025",
+      "url": "https://www.dodsbirsttr.mil/submissions/solicitation-documents/active-solicitations",
+      "confidence_score": 16.5,
+      "similarity_score": 0.165
+    }
+  ],
+  "summary": {
+    "total_matches": 15,
+    "high_confidence": 0,
+    "medium_confidence": 0,
+    "low_confidence": 15
+  },
+  "generated_at": "2025-07-17T17:34:21.240256"
+}
