@@ -1,0 +1,88 @@
+{
+  "name": "Alfredo Costilla-Reyes",
+  "research_interests": [
+    "Biomedical Engineering",
+    "Wearable Sensors",
+    "Wearable Devices",
+    "Electrical Engineering",
+    "VLSI",
+    "Remote Sensing",
+    "Remote Asset Monitoring",
+    "Microcontrollers",
+    "Microelectronics",
+    "Time-series data analysis",
+    "Edge Computing",
+    "Machine Learning",
+    "Data Science",
+    "Printed Circuit Boards",
+    "Entrepreneurship",
+    "Technology Transfer",
+    "Computer Science",
+    "Embedded Systems",
+    "Edge Computing",
+    "Healthcare"
+  ],
+  "education": [
+    {
+      "degree": "Ph.D.",
+      "field": "Electrical and Computer Engineering",
+      "institution": "Texas A&M University"
+    }
+  ],
+  "awards": [
+    {
+      "name": "Mexico's Highest Innovation Award",
+      "year": 2017,
+      "source": "Texas A&M Engineering News"
+    },
+    {
+      "name": "Kirchner Food Fellow",
+      "year": 2017,
+      "source": "Texas A&M Engineering News"
+    }
+  ],
+  "documents_processed": [
+    "CV PI Alfredo Costilla Reyes 04-2025.pdf",
+    "COSTILLAREYES-DISSERTATION-2020.pdf",
+    "AutoVideo.pdf",
+    "DiscoverPath.pdf",
+    "CAPTAIN.pdf",
+    "BED-Edge-Devices.pdf",
+    "A Fully Integrated Maximum Power Tracking.pdf",
+    "A power management unit with 40 dB switching-noise-suppression for a thermal harvesting array.pdf",
+    "Multiple-Input Harvesting Power.pdf",
+    "An Ultra-Low Power Power Management Unit with -40dB.pdf",
+    "Technology Enabling Circuits and Systems for the.pdf",
+    "A Time-Interleave-Based Power Management System with Maximum Power Extraction and Health Protection Algorithm for Multip.pdf",
+    "Reconfigurable System for Electromagnetic Energy.pdf",
+    "BP_Watermarked_UIUC__RBPC___Altitut_.pdf",
+    "ES_AIPOW_TexasA_MUniversity.pdf",
+    "NSF23_SBIR_ph2_ProjectDescription.pdf",
+    "NSF21_SBIR_AutoML_OnDeviceAI.pdf",
+    "NSF22_SBIR_ph2_AutoML_OnDeviceAI.pdf",
+    "DataEdge_FT1_AIPOWLLC_1.pdf",
+    "AIPow Project Narrative 10-10 v2.docx.pdf",
+    "NIH SBIR Phase 1 proposal (AD).pdf",
+    "RecommendationSystem-NSF21_PFI_Auto_GNN_2.pdf",
+    "NSF23_ExLENT_AutoVideo.pdf",
+    "NSF22_PFI_OutlierDetection_RemoteAssetMonitoring.pdf",
+    "Trialia_NIH_NCI_465___Cancer_Prevention_and_Treatment_Clinical_Trials_Tools.pdf",
+    "NSF21_PFI_Auto_GNN.pdf",
+    "NSF22_POSE_TODS.pdf",
+    "NIH LLMs.pdf",
+    "Basketball_Analysis_Report.pdf",
+    "ConvergenceAccelerator_Workplace_Equity.pdf",
+    "NIH SBIR Patient-Trial Matching.pdf",
+    "NSF22_POSE_Phase_2_TODS.pdf",
+    "FarmAssist-NIFA24___Phase_I_Altitut.pdf",
+    "NSF23_PFI_OutlierDetection_RemoteAssetMonitoring__OSU_Resubmission_.pdf",
+    "NSF22_PFI_OutlierDetection_RemoteAssetMonitoring__Resubmission_.pdf",
+    "Rice21_Auto_GNN.pdf",
+    "Resubmission NIH SBIR Phase 1 proposal (Deadline September 5 2022).pdf",
+    "NSF22_PFI_2_On_device_AI_TODSforAutomotive.pdf",
+    "NSF21_PFI_Auto_GNN__DriveThru_.pdf",
+    "NSF22_POSE_AK.pdf",
+    "Z Fellow - Application.pdf"
+  ],
+  "urls_processed": 6
+}

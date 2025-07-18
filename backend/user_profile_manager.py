@@ -9,10 +9,16 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 import hashlib
 
-from .pdf_extractor import PDFExtractor
-from .url_content_fetcher import URLContentFetcher
-from .embeddings_manager import GeminiEmbeddingsManager
-from .vector_database import VectorDatabaseManager
+try:
+    from .pdf_extractor import PDFExtractor
+    from .url_content_fetcher import URLContentFetcher
+    from .embeddings_manager import GeminiEmbeddingsManager
+    from .vector_database import VectorDatabaseManager
+except ImportError:
+    from pdf_extractor import PDFExtractor
+    from url_content_fetcher import URLContentFetcher
+    from embeddings_manager import GeminiEmbeddingsManager
+    from vector_database import VectorDatabaseManager
 
 
 class UserProfileManager:

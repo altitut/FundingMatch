@@ -1,0 +1,16 @@
+# FundingMatch Requirements
+# AI-Powered Funding Opportunity Matching System
+
+# Core Dependencies
+google-genai>=0.1.0          # Google Gemini AI API
+chromadb>=0.4.0              # Vector database for embeddings
+python-dotenv>=1.0.0         # Environment variable management
+PyMuPDF>=1.23.0              # PDF text extraction
+beautifulsoup4>=4.12.0       # HTML parsing for URL content
+requests>=2.31.0             # HTTP requests for URL fetching
+numpy<2.0                    # Array operations (ChromaDB compatible)
+
+# Optional Dependencies (for development)
+pytest>=7.0.0                # Testing framework
+black>=23.0.0                # Code formatting
+flake8>=6.0.0                # Code linting

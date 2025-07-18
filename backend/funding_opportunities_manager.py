@@ -12,9 +12,14 @@ from typing import List, Dict, Any, Tuple, Optional
 from pathlib import Path
 import hashlib
 
-from .embeddings_manager import GeminiEmbeddingsManager
-from .vector_database import VectorDatabaseManager
-from .url_content_fetcher import URLContentFetcher
+try:
+    from .embeddings_manager import GeminiEmbeddingsManager
+    from .vector_database import VectorDatabaseManager
+    from .url_content_fetcher import URLContentFetcher
+except ImportError:
+    from embeddings_manager import GeminiEmbeddingsManager
+    from vector_database import VectorDatabaseManager
+    from url_content_fetcher import URLContentFetcher
 
 
 class FundingOpportunitiesManager:
