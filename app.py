@@ -6,8 +6,10 @@ Provides REST endpoints for the React frontend
 
 import os
 import sys
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, Response
 from flask_cors import CORS
+import queue
+import threading
 from werkzeug.utils import secure_filename
 import json
 from datetime import datetime
@@ -54,6 +56,21 @@ def health_check():
     })
 
 
+@app.route('/api/test-ingest', methods=['POST'])
+def test_ingest():
+    """Simple test endpoint for ingestion"""
+    try:
+        return jsonify({
+            'success': True,
+            'message': 'Test endpoint working',
+            'request_method': request.method,
+            'files_present': 'file' in request.files,
+            'file_count': len(request.files) if request.files else 0
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @app.route('/api/stats', methods=['GET'])
 def get_stats():
     """Get database statistics"""
@@ -69,6 +86,279 @@ def get_stats():
             'error': str(e)
         }), 500
 
+
+@app.route('/api/opportunities', methods=['GET'])
+def get_opportunities():
+    """Get all funding opportunities"""
+    try:
+        # Get all opportunities from the database
+        opportunities = vector_db.get_all_opportunities()
+        return jsonify({
+            'success': True,
+            'opportunities': opportunities
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/users', methods=['GET'])
+def get_users():
+    """Get all users with their documents"""
+    try:
+        # Get all users from the database
+        users = vector_db.get_all_researchers()
+        
+        # If no users in vector DB but files exist, create temporary users from files
+        if not users:
+            upload_dir = app.config['UPLOAD_FOLDER']
+            if os.path.exists(upload_dir):
+                # Look for JSON files to extract user names
+                json_files = [f for f in os.listdir(upload_dir) if f.endswith('.json')]
+                for json_file in json_files:
+                    try:
+                        with open(os.path.join(upload_dir, json_file), 'r') as f:
+                            data = json.load(f)
+                            person = data.get('person', {})
+                            name = person.get('name', '')
+                            if name:
+                                # Generate same ID as user_profile_manager
+                                import hashlib
+                                user_id = hashlib.md5(name.encode()).hexdigest()
+                                users.append({
+                                    'id': user_id,
+                                    'name': name,
+                                    'research_interests': person.get('biographical_information', {}).get('research_interests', [])
+                                })
+                    except:
+                        pass
+        
+        # Get processed documents for each user
+        users_with_docs = []
+        for user in users:
+            user_data = {
+                'id': user.get('id'),
+                'name': user.get('name'),
+                'documents': [],
+                'urls': []
+            }
+            
+            # Get documents from uploads folder
+            upload_dir = app.config['UPLOAD_FOLDER']
+            if os.path.exists(upload_dir):
+                for file in os.listdir(upload_dir):
+                    if file.endswith('.pdf'):
+                        user_data['documents'].append({
+                            'name': file,
+                            'status': 'processed'
+                        })
+                    elif file.endswith('.json') and user.get('name') in file:
+                        # Parse JSON to get URLs
+                        try:
+                            with open(os.path.join(upload_dir, file), 'r') as f:
+                                data = json.load(f)
+                                links = data.get('person', {}).get('links', [])
+                                for link in links:
+                                    user_data['urls'].append({
+                                        'url': link.get('url', ''),
+                                        'type': link.get('type', ''),
+                                        'status': 'processed'
+                                    })
+                        except:
+                            pass
+            
+            users_with_docs.append(user_data)
+        
+        return jsonify({
+            'success': True,
+            'users': users_with_docs
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/profile/remove-document', methods=['POST'])
+def remove_document():
+    """Remove a document from user profile"""
+    try:
+        data = request.json
+        filename = data.get('filename')
+        
+        if not filename:
+            return jsonify({'success': False, 'error': 'No filename provided'}), 400
+        
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/users/<user_id>', methods=['DELETE'])
+def delete_user(user_id):
+    """Delete a user and all their associated data"""
+    try:
+        # Remove user from vector database
+        vector_db.remove_researcher(user_id)
+        
+        # Remove all files associated with the user
+        upload_dir = app.config['UPLOAD_FOLDER']
+        if os.path.exists(upload_dir):
+            for file in os.listdir(upload_dir):
+                filepath = os.path.join(upload_dir, file)
+                # Remove files that might be associated with this user
+                try:
+                    os.remove(filepath)
+                except:
+                    pass
+        
+        return jsonify({
+            'success': True,
+            'message': 'User and associated data removed successfully'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/profile/process', methods=['POST'])
+def process_profile_updates():
+    """Process new documents for embeddings"""
+    try:
+        data = request.json
+        user_id = data.get('user_id')
+        new_files = data.get('new_files', [])
+        
+        # Re-create profile with all documents
+        json_files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.endswith('.json')]
+        if not json_files:
+            return jsonify({'success': False, 'error': 'No user profile found'}), 400
+        
+        json_path = os.path.join(app.config['UPLOAD_FOLDER'], json_files[0])
+        pdf_files = [os.path.join(app.config['UPLOAD_FOLDER'], f) 
+                    for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.endswith('.pdf')]
+        
+        # Create updated profile
+        profile = user_manager.create_user_profile(json_path, pdf_files)
+        success = user_manager.store_user_profile(profile)
+        
+        return jsonify({'success': success})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/profile/update', methods=['POST'])
+def update_profile():
+    """Update existing user profile with new documents"""
+    try:
+        data = request.json
+        user_id = data.get('user_id')
+        files = data.get('files', [])
+        urls = data.get('urls', [])
+        add_only = data.get('add_only', True)
+        
+        if not user_id:
+            return jsonify({'success': False, 'error': 'No user_id provided'}), 400
+        
+        # Get existing user data
+        user_data = vector_db.researchers.get(ids=[user_id], include=['metadatas'])
+        if not user_data or not user_data.get('metadatas'):
+            return jsonify({'success': False, 'error': 'User not found'}), 404
+        
+        # Find the user's JSON file
+        json_file = None
+        upload_dir = app.config['UPLOAD_FOLDER']
+        
+        # Try to find matching JSON file by checking content
+        json_files = [f for f in os.listdir(upload_dir) if f.endswith('.json')]
+        for jf in json_files:
+            try:
+                with open(os.path.join(upload_dir, jf), 'r') as f:
+                    json_data = json.load(f)
+                    person = json_data.get('person', {})
+                    name = person.get('name', '')
+                    # Generate ID same way as user_profile_manager
+                    import hashlib
+                    file_user_id = hashlib.md5(name.encode()).hexdigest()
+                    if file_user_id == user_id:
+                        json_file = os.path.join(upload_dir, jf)
+                        break
+            except:
+                pass
+        
+        if not json_file:
+            # Create a basic JSON file from existing metadata
+            metadata = user_data['metadatas'][0]
+            profile_data = {
+                "person": {
+                    "name": metadata.get('name', 'User'),
+                    "biographical_information": {
+                        "research_interests": metadata.get('research_interests', []),
+                        "education": [],
+                        "awards": []
+                    },
+                    "links": [{"url": url, "type": "web"} for url in urls if url]
+                }
+            }
+            json_file = os.path.join(upload_dir, f"{user_id}_profile.json")
+            with open(json_file, 'w') as f:
+                json.dump(profile_data, f)
+        
+        # Get all PDF files to process
+        pdf_files = []
+        for file_info in files:
+            if file_info.get('type') == 'pdf':
+                filepath = file_info.get('path', '')
+                # Handle both absolute and relative paths
+                if not os.path.isabs(filepath):
+                    filepath = os.path.join(os.path.dirname(__file__), filepath)
+                if os.path.exists(filepath):
+                    pdf_files.append(filepath)
+        
+        # Create updated profile with all documents
+        profile = user_manager.create_user_profile(json_file, pdf_files)
+        
+        # Update the URLs in the profile
+        if urls:
+            existing_links = profile.get('links', [])
+            for url in urls:
+                if url and not any(link['url'] == url for link in existing_links):
+                    existing_links.append({"url": url, "type": "web"})
+            profile['links'] = existing_links
+        
+        # Store updated profile
+        success = user_manager.store_user_profile(profile)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': 'Profile updated successfully',
+                'documents_processed': len(pdf_files)
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to update profile'
+            }), 500
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+# Global progress queue for SSE
+progress_queues = {}
 
 @app.route('/api/ingest/csv', methods=['POST'])
 def ingest_csv():
@@ -93,13 +383,45 @@ def ingest_csv():
         final_path = os.path.join('FundingOpportunities', filename)
         os.rename(temp_path, final_path)
         
-        # Process the file
-        processed_count = funding_manager.process_csv_files()
+        # Generate a unique session ID for progress tracking
+        session_id = datetime.now().strftime('%Y%m%d%H%M%S') + '_' + filename
+        
+        # Create a progress queue for this session
+        progress_queue = queue.Queue()
+        progress_queues[session_id] = progress_queue
+        
+        # Process in background thread
+        def process_with_progress():
+            def progress_callback(progress_data):
+                progress_queue.put(json.dumps(progress_data))
+            
+            try:
+                summary = funding_manager.process_single_csv_file(filename, 
+                                                                progress_callback=progress_callback)
+                # Send final summary
+                progress_queue.put(json.dumps({
+                    'status': 'complete',
+                    'summary': summary
+                }))
+            except Exception as e:
+                progress_queue.put(json.dumps({
+                    'status': 'error',
+                    'error': str(e)
+                }))
+            finally:
+                # Clean up after 5 minutes
+                threading.Timer(300, lambda: progress_queues.pop(session_id, None)).start()
+        
+        # Start processing in background
+        thread = threading.Thread(target=process_with_progress)
+        thread.daemon = True
+        thread.start()
         
         return jsonify({
             'success': True,
-            'message': f'Successfully processed {processed_count} files',
-            'filename': filename
+            'session_id': session_id,
+            'filename': filename,
+            'message': 'Processing started. Use session_id to track progress.'
         })
         
     except Exception as e:
@@ -107,6 +429,48 @@ def ingest_csv():
             'success': False,
             'error': str(e)
         }), 500
+
+
+@app.route('/api/ingest/progress/<session_id>')
+def ingest_progress(session_id):
+    """Server-Sent Events endpoint for progress updates"""
+    def generate():
+        if session_id not in progress_queues:
+            yield f"data: {json.dumps({'error': 'Invalid session ID'})}\n\n"
+            return
+        
+        progress_queue = progress_queues[session_id]
+        
+        # Send initial connection message
+        yield f"data: {json.dumps({'status': 'connected'})}\n\n"
+        
+        # Send progress updates
+        while True:
+            try:
+                # Wait for progress update with timeout
+                progress_data = progress_queue.get(timeout=30)
+                yield f"data: {progress_data}\n\n"
+                
+                # Check if processing is complete
+                data = json.loads(progress_data)
+                if data.get('status') in ['complete', 'error']:
+                    break
+                    
+            except queue.Empty:
+                # Send keepalive
+                yield f"data: {json.dumps({'keepalive': True})}\n\n"
+            except Exception as e:
+                yield f"data: {json.dumps({'error': str(e)})}\n\n"
+                break
+    
+    return Response(
+        generate(),
+        mimetype='text/event-stream',
+        headers={
+            'Cache-Control': 'no-cache',
+            'X-Accel-Buffering': 'no'
+        }
+    )
 
 
 @app.route('/api/profile/upload', methods=['POST'])
@@ -186,6 +550,7 @@ def create_profile():
         if success:
             # Save profile summary
             profile_summary = {
+                'id': profile['id'],
                 'name': profile['name'],
                 'research_interests': profile['research_interests'],
                 'documents_processed': len(profile['extracted_pdfs']),
@@ -194,7 +559,8 @@ def create_profile():
             
             return jsonify({
                 'success': True,
-                'profile': profile_summary
+                'profile': profile_summary,
+                'user_id': profile['id']
             })
         else:
             return jsonify({
@@ -213,34 +579,126 @@ def create_profile():
 def match_opportunities():
     """Match user profile with funding opportunities"""
     try:
-        # Get the stored profile
-        upload_dir = app.config['UPLOAD_FOLDER']
-        json_files = [f for f in os.listdir(upload_dir) if f.endswith('.json')]
-        
-        if not json_files:
+        # Get user_id from request
+        user_id = request.json.get('user_id')
+        if not user_id:
             return jsonify({
                 'success': False,
-                'error': 'No user profile found. Please create a profile first.'
+                'error': 'No user_id provided'
             }), 400
         
-        # Use the first JSON file
-        json_path = os.path.join(upload_dir, json_files[0])
-        
-        # Get PDFs
-        pdf_files = [os.path.join(upload_dir, f) for f in os.listdir(upload_dir) 
-                    if f.endswith('.pdf')]
-        
-        # Recreate profile
-        profile = user_manager.create_user_profile(json_path, pdf_files)
-        
-        # Get matches
+        # Search for matching opportunities directly using user's ID
         n_results = request.json.get('n_results', 20)
-        matches = user_manager.match_user_to_opportunities(profile, n_results=n_results)
+        
+        # Get user embeddings from the database
+        try:
+            result = vector_db.researchers.get(ids=[user_id], include=['embeddings', 'metadatas', 'documents'])
+        except Exception as e:
+            print(f"Error getting user from vector DB: {e}")
+            result = None
+        
+        # Check if we have valid embeddings
+        has_embeddings = False
+        if result and 'embeddings' in result and result['embeddings'] is not None:
+            # Check if embeddings list is not empty and first embedding exists
+            if len(result['embeddings']) > 0 and result['embeddings'][0] is not None:
+                has_embeddings = True
+        
+        if not has_embeddings:
+            # Try to find user in files and recreate profile
+            upload_dir = app.config['UPLOAD_FOLDER']
+            user_found = False
+            
+            if os.path.exists(upload_dir):
+                # Look for JSON files with matching user
+                json_files = [f for f in os.listdir(upload_dir) if f.endswith('.json')]
+                for json_file in json_files:
+                    try:
+                        json_path = os.path.join(upload_dir, json_file)
+                        with open(json_path, 'r') as f:
+                            data = json.load(f)
+                            person = data.get('person', {})
+                            name = person.get('name', '')
+                            if name:
+                                # Generate same ID as user_profile_manager
+                                import hashlib
+                                file_user_id = hashlib.md5(name.encode()).hexdigest()
+                                
+                                if file_user_id == user_id:
+                                    # Found the user - recreate profile
+                                    pdf_files = [os.path.join(upload_dir, f) 
+                                               for f in os.listdir(upload_dir) if f.endswith('.pdf')]
+                                    
+                                    # Recreate and store profile
+                                    profile = user_manager.create_user_profile(json_path, pdf_files)
+                                    success = user_manager.store_user_profile(profile)
+                                    
+                                    if success:
+                                        # Try again to get embeddings
+                                        result = vector_db.researchers.get(ids=[user_id], include=['embeddings', 'metadatas', 'documents'])
+                                        user_found = True
+                                    break
+                    except Exception as e:
+                        print(f"Error processing file {json_file}: {e}")
+                        pass
+            
+            # Re-check embeddings after profile creation
+            has_embeddings = False
+            if result and 'embeddings' in result and result['embeddings'] is not None:
+                if len(result['embeddings']) > 0 and result['embeddings'][0] is not None:
+                    has_embeddings = True
+            
+            if not user_found or not has_embeddings:
+                return jsonify({
+                    'success': False,
+                    'error': 'User not found. Please create a profile first.'
+                }), 400
+        
+        # Use the stored embedding to search for opportunities
+        user_embedding = result['embeddings'][0]
+        matches = vector_db.search_opportunities_for_profile(
+            user_embedding,
+            n_results=n_results
+        )
+        
+        # Format matches for frontend
+        formatted_matches = []
+        for match in matches:
+            # Calculate confidence scores (0-100)
+            similarity = match.get('similarity_score', 0)
+            confidence = min(100, max(0, similarity * 100))
+            
+            # Handle keywords - ensure it's always a list
+            keywords = match.get('keywords', [])
+            if isinstance(keywords, str):
+                try:
+                    # Try to parse as JSON if it's a string
+                    import json as json_module
+                    keywords = json_module.loads(keywords)
+                except:
+                    # If parsing fails, treat as comma-separated string
+                    keywords = [k.strip() for k in keywords.split(',') if k.strip()]
+            elif not isinstance(keywords, list):
+                keywords = []
+            
+            formatted_matches.append({
+                'title': match.get('title', 'Unknown'),
+                'agency': match.get('agency', 'Unknown'),
+                'description': match.get('description', '')[:200] + '...' if match.get('description') else '',
+                'keywords': keywords[:5] if keywords else [],
+                'deadline': match.get('close_date', 'Not specified'),
+                'url': match.get('url', ''),
+                'confidence_score': round(confidence, 1),
+                'similarity_score': round(similarity, 3)
+            })
+        
+        # Sort by confidence score
+        formatted_matches.sort(key=lambda x: x['confidence_score'], reverse=True)
         
         return jsonify({
             'success': True,
-            'matches': matches,
-            'total': len(matches)
+            'matches': formatted_matches,
+            'total': len(formatted_matches)
         })
         
     except Exception as e:
@@ -311,5 +769,5 @@ def serve_react(path):
 
 
 if __name__ == '__main__':
-    port = int(os.getenv('PORT', 5000))
+    port = int(os.getenv('PORT', 5001))
     app.run(debug=True, port=port)

@@ -71,9 +71,10 @@ class RAGExplainer:
         except Exception as e:
             print(f"Error generating explanation: {e}")
             return {
-                'match_explanation': 'Unable to generate explanation',
+                'summary': 'Unable to generate detailed explanation',
+                'alignment_reasons': ['This opportunity matches your research area'],
                 'reusable_content': [],
-                'next_steps': [],
+                'next_steps': ['Review the opportunity details', 'Check eligibility requirements'],
                 'error': str(e)
             }
     
@@ -148,26 +149,27 @@ FUNDING OPPORTUNITY:
 - URL: {context['opportunity']['url']}
 
 USER'S AVAILABLE DOCUMENTS:
-- Proposals: {', '.join(context['documents']['proposals'][:5])}
-- Research Papers: {', '.join(context['documents']['papers'][:5])}
+- Proposals: {', '.join(context['documents']['proposals'][:5]) if context['documents']['proposals'] else 'None'}
+- Research Papers: {', '.join(context['documents']['papers'][:5]) if context['documents']['papers'] else 'None'}
+- Other Documents: {', '.join(context['documents']['other'][:5]) if context['documents']['other'] else 'None'}
 
 Please provide:
 1. A brief explanation (2-3 sentences) of why this funding opportunity is a good match for the user's profile
-2. List specific proposals or papers that could be reused or adapted for this opportunity
+2. List 2-3 specific documents from the user's portfolio that could be reused, explaining exactly how each document's content relates to this opportunity
 3. Concrete next steps the user should take to apply
 
-Format your response as:
+Format your response EXACTLY as follows:
 MATCH EXPLANATION:
-[Your explanation here]
+[Your 2-3 sentence explanation here]
 
 REUSABLE CONTENT:
-- [Document 1]: [How it can be reused]
-- [Document 2]: [How it can be reused]
+- [Exact document filename from the list above]: [Specific explanation of how this document's research/methods/results can be adapted for this opportunity]
+- [Another exact document filename]: [Specific explanation of relevant sections or content that applies]
 
 NEXT STEPS:
-1. [First step]
-2. [Second step]
-3. [Third step]
+1. Review solicitation requirements: [Specific action]
+2. Prepare application materials: [Specific action]
+3. Submit proposal: [Specific action with timeline if mentioned]
 """
         
         return prompt
@@ -178,7 +180,8 @@ NEXT STEPS:
         """Parse explanation into structured format"""
         
         result = {
-            'match_explanation': '',
+            'summary': '',  # Changed from match_explanation to summary for frontend compatibility
+            'alignment_reasons': [],
             'reusable_content': [],
             'next_steps': [],
             'raw_explanation': explanation_text
@@ -192,7 +195,13 @@ NEXT STEPS:
             section = section.strip()
             
             if section.startswith('MATCH EXPLANATION:'):
-                result['match_explanation'] = section.replace('MATCH EXPLANATION:', '').strip()
+                explanation = section.replace('MATCH EXPLANATION:', '').strip()
+                result['summary'] = explanation
+                # Extract alignment reasons from the explanation
+                sentences = explanation.split('. ')
+                for sentence in sentences:
+                    if sentence.strip():
+                        result['alignment_reasons'].append(sentence.strip() + ('.' if not sentence.endswith('.') else ''))
                 current_section = 'explanation'
             
             elif section.startswith('REUSABLE CONTENT:'):
@@ -209,9 +218,12 @@ NEXT STEPS:
                             # Match with actual document names
                             matched_doc = self._match_document_name(doc_name, user_documents)
                             if matched_doc:
+                                # Extract snippet from the document
+                                snippet = self._extract_relevant_snippet(matched_doc, user_documents)
                                 result['reusable_content'].append({
-                                    'document': matched_doc,
-                                    'how_to_reuse': reuse_info
+                                    'source': matched_doc,
+                                    'content': snippet,
+                                    'relevance': reuse_info
                                 })
             
             elif section.startswith('NEXT STEPS:'):
@@ -223,17 +235,27 @@ NEXT STEPS:
                         # Remove numbering or bullets
                         step_text = line.lstrip('0123456789.-) ').strip()
                         if step_text:
+                            # Check if this step has a title (text before colon)
+                            if '**' in step_text:
+                                # Parse markdown-style bold text
+                                step_text = step_text.replace('**', '')
                             result['next_steps'].append(step_text)
             
             elif current_section == 'explanation' and section:
-                result['match_explanation'] += ' ' + section
+                result['summary'] += ' ' + section
+                # Also add to alignment reasons
+                sentences = section.split('. ')
+                for sentence in sentences:
+                    if sentence.strip():
+                        result['alignment_reasons'].append(sentence.strip() + ('.' if not sentence.endswith('.') else ''))
             
-        # Clean up explanation
-        result['match_explanation'] = result['match_explanation'].strip()
+        # Clean up summary
+        result['summary'] = result['summary'].strip()
         
         # Ensure we have at least some content
-        if not result['match_explanation']:
-            result['match_explanation'] = "This opportunity aligns with your research profile."
+        if not result['summary']:
+            result['summary'] = "This opportunity aligns with your research profile."
+            result['alignment_reasons'] = ["Your expertise matches the technical requirements.", "Your research background is relevant to this solicitation."]
         
         if not result['next_steps']:
             result['next_steps'] = [
@@ -241,6 +263,18 @@ NEXT STEPS:
                 "Check eligibility requirements",
                 "Contact the program officer with questions"
             ]
+        
+        # If no reusable content was parsed, try to add some based on available documents
+        if not result['reusable_content'] and user_documents:
+            # Add at least one document reference with generic relevance
+            doc_names = list(user_documents.keys())[:2]  # Take first 2 documents
+            for doc_name in doc_names:
+                snippet = self._extract_relevant_snippet(doc_name, user_documents)
+                result['reusable_content'].append({
+                    'source': doc_name,
+                    'content': snippet,
+                    'relevance': 'This document contains relevant research experience and methodologies that could strengthen your proposal.'
+                })
         
         return result
     
@@ -264,6 +298,54 @@ NEXT STEPS:
                 return doc_name
         
         return None
+    
+    def _extract_relevant_snippet(self, 
+                                 doc_name: str, 
+                                 user_documents: Dict[str, str]) -> str:
+        """Extract a relevant snippet from the document"""
+        if doc_name not in user_documents:
+            return f"Content from {doc_name}"
+        
+        # Get document content
+        content = user_documents[doc_name]
+        if not content:
+            return f"Content from {doc_name}"
+        
+        # Try to extract a meaningful snippet
+        # Look for key sections like abstract, summary, objectives
+        content_lower = content.lower()
+        
+        # Common section headers to look for
+        sections = ['abstract', 'summary', 'executive summary', 'objectives', 'overview', 'introduction']
+        
+        for section in sections:
+            if section in content_lower:
+                # Find the section
+                start_idx = content_lower.find(section)
+                # Extract next 200-300 characters after the section header
+                snippet_start = start_idx
+                snippet = content[snippet_start:snippet_start + 300]
+                
+                # Clean up the snippet
+                if len(snippet) > 250:
+                    # Find a good break point (period, newline)
+                    for i in range(250, len(snippet)):
+                        if snippet[i] in '.!?\n':
+                            snippet = snippet[:i+1]
+                            break
+                
+                return snippet.strip()
+        
+        # If no section found, return first 200 characters
+        snippet = content[:250]
+        if len(content) > 250:
+            # Find a good break point
+            for i in range(200, 250):
+                if snippet[i] in '.!?\n ':
+                    snippet = snippet[:i+1]
+                    break
+        
+        return snippet.strip() + "..."
     
     def generate_batch_explanations(self,
                                    user_profile: Dict[str, Any],

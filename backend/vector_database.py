@@ -58,22 +58,33 @@ class VectorDatabaseManager:
         
     def add_researcher_profile(self, profile_id: str, profile: Dict[str, Any], embedding: List[float]):
         """
-        Add researcher profile to vector database
+        Add researcher profile to vector database with duplicate checking
         
         Args:
             profile_id: Unique identifier for the profile
             profile: Profile data
             embedding: Profile embedding vector
         """
+        # Check if researcher already exists
+        try:
+            existing = self.researchers.get(ids=[profile_id])
+            if existing and isinstance(existing, dict) and existing.get('ids') and len(existing['ids']) > 0:
+                print(f"  ℹ️  Researcher profile already exists for {profile.get('name', 'Unknown')}, updating...")
+        except Exception as e:
+            # If error getting (e.g., empty collection), continue with add
+            print(f"  Debug: Error checking existing profile: {e}")
+            pass
+        
         # Prepare metadata (ChromaDB has limits on metadata)
         metadata = {
-            "researcher_name": profile.get("profile_metadata", {}).get("primary_researcher", "Unknown"),
-            "total_documents": str(profile.get("profile_metadata", {}).get("total_documents", 0)),
-            "research_domains": json.dumps(profile.get("portfolio_summary", {}).get("research_domains", [])),
+            "researcher_name": str(profile.get("name", "Unknown")),
+            "total_documents": str(len(profile.get("extracted_pdfs", {}))),
+            "research_interests": json.dumps(profile.get("research_interests", []))[:500],  # Limit length
+            "summary": str(profile.get("summary", ""))[:500],
             "timestamp": datetime.now().isoformat()
         }
         
-        # Store in ChromaDB
+        # Store in ChromaDB (upsert will update if exists)
         self.researchers.upsert(
             ids=[profile_id],
             embeddings=[embedding],
@@ -251,11 +262,111 @@ class VectorDatabaseManager:
     
     def get_collection_stats(self) -> Dict[str, int]:
         """Get statistics about collections"""
+        try:
+            # Try to get counts directly
+            researchers_count = self.researchers.count()
+            opportunities_count = self.opportunities.count()
+            proposals_count = self.proposals.count()
+        except Exception as e:
+            # If count() fails, try to get all items and count them
+            print(f"Warning: Direct count failed, using fallback method: {e}")
+            try:
+                researchers_result = self.researchers.get()
+                researchers_count = len(researchers_result['ids']) if researchers_result and 'ids' in researchers_result else 0
+            except:
+                researchers_count = 0
+            
+            try:
+                opportunities_result = self.opportunities.get()
+                opportunities_count = len(opportunities_result['ids']) if opportunities_result and 'ids' in opportunities_result else 0
+            except:
+                opportunities_count = 0
+                
+            try:
+                proposals_result = self.proposals.get()
+                proposals_count = len(proposals_result['ids']) if proposals_result and 'ids' in proposals_result else 0
+            except:
+                proposals_count = 0
+        
         return {
-            "researchers": self.researchers.count(),
-            "opportunities": self.opportunities.count(),
-            "proposals": self.proposals.count()
+            "researchers": researchers_count,
+            "opportunities": opportunities_count,
+            "proposals": proposals_count
         }
+    
+    def get_all_opportunities(self) -> List[Dict[str, Any]]:
+        """Get all funding opportunities"""
+        try:
+            # Get all opportunities
+            results = self.opportunities.get()
+            
+            opportunities = []
+            if results and isinstance(results, dict) and 'ids' in results and results['ids']:
+                for i, id in enumerate(results['ids']):
+                    metadata = results['metadatas'][i] if 'metadatas' in results else {}
+                    # Parse the full document to get all fields
+                    if 'documents' in results and i < len(results['documents']):
+                        try:
+                            doc = json.loads(results['documents'][i])
+                            opportunities.append({
+                                'id': id,
+                                'title': doc.get('title', metadata.get('title', 'Unknown')),
+                                'agency': doc.get('agency', metadata.get('agency', 'Unknown')),
+                                'url': doc.get('url', doc.get('solicitation_url', doc.get('sbir_topic_link', ''))),
+                                'description': (doc.get('description', '')[:200] + '...') if doc.get('description') else '',
+                                'deadline': doc.get('close_date', doc.get('deadline', metadata.get('deadline', '')))
+                            })
+                        except:
+                            # Fallback to metadata only
+                            opportunities.append({
+                                'id': id,
+                                'title': metadata.get('title', 'Unknown'),
+                                'agency': metadata.get('agency', 'Unknown'),
+                                'url': '',
+                                'description': '',
+                                'deadline': metadata.get('deadline', '')
+                            })
+            
+            return opportunities
+        except Exception as e:
+            print(f"Error getting opportunities: {e}")
+            return []
+    
+    def get_all_researchers(self) -> List[Dict[str, Any]]:
+        """Get all researchers"""
+        try:
+            # Get all researchers - handle empty collection
+            try:
+                results = self.researchers.get()
+            except Exception as e:
+                if "empty" in str(e).lower() or "no items" in str(e).lower():
+                    return []
+                # Try alternate method for ChromaDB 0.5.0
+                try:
+                    # Get count first
+                    count = self.researchers.count()
+                    if count == 0:
+                        return []
+                    # If there are items, try to get them
+                    results = self.researchers.get(limit=count)
+                except:
+                    return []
+            
+            researchers = []
+            if results and results.get('ids'):
+                for i, id in enumerate(results['ids']):
+                    metadata = results['metadatas'][i] if results.get('metadatas') else {}
+                    researchers.append({
+                        'id': id,
+                        'name': metadata.get('researcher_name', 'Unknown'),
+                        'research_interests': metadata.get('research_interests', []),
+                        'summary': metadata.get('summary', '')
+                    })
+            
+            return researchers
+        except Exception as e:
+            print(f"Error getting researchers: {e}")
+            return []
     
     def clear_collection(self, collection_name: str):
         """Clear a specific collection"""
@@ -268,6 +379,15 @@ class VectorDatabaseManager:
         elif collection_name == "proposals":
             self.client.delete_collection("proposals")
             self._init_collections()
+    
+    def remove_researcher(self, researcher_id: str):
+        """Remove a specific researcher from the database"""
+        try:
+            self.researchers.delete(ids=[researcher_id])
+            return True
+        except Exception as e:
+            print(f"Error removing researcher {researcher_id}: {e}")
+            return False
 
 
 if __name__ == "__main__":
