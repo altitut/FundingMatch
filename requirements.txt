@@ -10,6 +10,10 @@ beautifulsoup4>=4.12.0       # HTML parsing for URL content
 requests>=2.31.0             # HTTP requests for URL fetching
 numpy<2.0                    # Array operations (ChromaDB compatible)
 
+# Web Framework Dependencies
+flask>=2.3.0                 # Web framework
+flask-cors>=4.0.0            # CORS support for React frontend
+
 # Optional Dependencies (for development)
 pytest>=7.0.0                # Testing framework
 black>=23.0.0                # Code formatting
