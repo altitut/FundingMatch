@@ -97,6 +97,31 @@ class FundingOpportunitiesManager:
         if year:
             id_string += f"|{year}"
         
+        # For opportunities with the same title/agency/topic, use dates to differentiate
+        # This handles cases where HHS has multiple solicitations with same topic number
+        close_date = (opportunity.get('close_date', '') or 
+                     opportunity.get('Close Date', '') or
+                     opportunity.get('deadline', '') or
+                     opportunity.get('Deadline', '')).strip()
+        if close_date:
+            id_string += f"|{close_date}"
+        
+        # Also include release date if available as additional differentiator
+        release_date = (opportunity.get('release_date', '') or 
+                       opportunity.get('Release Date', '')).strip()
+        if release_date:
+            id_string += f"|{release_date}"
+        
+        # If still no unique identifiers, add URL as last resort
+        if not close_date and not release_date:
+            url = (opportunity.get('url', '') or 
+                   opportunity.get('URL', '') or
+                   opportunity.get('solicitation_url', '') or
+                   opportunity.get('Solicitation URL', '')).strip()
+            if url:
+                # Use just the last part of URL to avoid full URL in hash
+                id_string += f"|{url.split('/')[-1]}"
+        
         # Generate hash
         return hashlib.md5(id_string.encode()).hexdigest()
     

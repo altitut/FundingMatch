@@ -75,10 +75,22 @@ def test_ingest():
 def get_stats():
     """Get database statistics"""
     try:
-        stats = vector_db.get_collection_stats()
+        # Get stats from vector DB
+        db_stats = vector_db.get_collection_stats()
+        
+        # Also get tracked opportunities count
+        tracked_count = len(funding_manager.processed_ids.get("opportunities", {}))
+        
+        # If there's a mismatch, use the vector DB as source of truth
+        if db_stats['opportunities'] == 0 and tracked_count > 0:
+            print(f"Warning: Mismatch - Tracked: {tracked_count}, In DB: {db_stats['opportunities']}")
+            # Clear the tracked IDs since they're not in the database
+            funding_manager.processed_ids["opportunities"] = {}
+            funding_manager._save_processed_ids()
+        
         return jsonify({
             'success': True,
-            'stats': stats
+            'stats': db_stats
         })
     except Exception as e:
         return jsonify({
@@ -96,6 +108,39 @@ def get_opportunities():
         return jsonify({
             'success': True,
             'opportunities': opportunities
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/sync-database', methods=['POST'])
+def sync_database():
+    """Sync tracked opportunities with vector database"""
+    try:
+        # Get tracked IDs
+        tracked_ids = funding_manager.processed_ids.get("opportunities", {})
+        
+        # Get IDs actually in database
+        db_opportunities = vector_db.get_all_opportunities()
+        db_ids = {opp['id'] for opp in db_opportunities}
+        
+        # Find tracked IDs not in database
+        missing_ids = set(tracked_ids.keys()) - db_ids
+        
+        # Remove missing IDs from tracking
+        for missing_id in missing_ids:
+            del funding_manager.processed_ids["opportunities"][missing_id]
+        
+        funding_manager._save_processed_ids()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Synced database. Removed {len(missing_ids)} orphaned tracking entries.',
+            'tracked_count': len(funding_manager.processed_ids.get("opportunities", {})),
+            'db_count': len(db_opportunities)
         })
     except Exception as e:
         return jsonify({
