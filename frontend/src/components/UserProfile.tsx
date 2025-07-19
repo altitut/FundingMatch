@@ -59,6 +59,7 @@ const UserProfile: React.FC = () => {
   const [editFiles, setEditFiles] = useState<UploadedFile[]>([]);
   const [editUrls, setEditUrls] = useState<string[]>(['']);
   const [isEditDragging, setIsEditDragging] = useState(false);
+  const [reprocessingUserId, setReprocessingUserId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -317,17 +318,60 @@ const UserProfile: React.FC = () => {
   };
 
   const handleProcessUser = async (userId: string) => {
+    // Find the user name for better feedback
+    const user = users.find(u => u.id === userId);
+    const userName = user?.name || 'User';
+    
+    setReprocessingUserId(userId);
+    setMessage({ type: 'info', text: `Reprocessing profile for ${userName}...` });
+    setProgress('Starting reprocessing...');
+    
     try {
+      // Add a longer timeout for reprocessing
       const response = await axios.post(`${API_BASE}/profile/process`, {
         user_id: userId,
         new_files: [],
+      }, {
+        timeout: 300000, // 5 minute timeout
+        onUploadProgress: (progressEvent) => {
+          setProgress('Processing documents and generating embeddings...');
+        }
       });
+      
       if (response.data.success) {
-        setMessage({ type: 'success', text: 'User profile reprocessed successfully' });
+        setMessage({ 
+          type: 'success', 
+          text: `Profile for ${userName} reprocessed successfully. Documents: ${response.data.documents_processed || 0}, URLs: ${response.data.urls_processed || 0}` 
+        });
+        setProgress('');
         fetchUsers();
+      } else {
+        setMessage({ 
+          type: 'error', 
+          text: response.data.error || `Failed to reprocess profile for ${userName}` 
+        });
+        setProgress('');
       }
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to process user profile' });
+    } catch (error: any) {
+      console.error('Reprocessing error:', error);
+      let errorMessage = `Failed to reprocess profile for ${userName}`;
+      
+      if (error.response) {
+        // Server responded with error
+        errorMessage = error.response.data?.error || errorMessage;
+        if (error.response.status === 500) {
+          errorMessage += '. The server encountered an internal error.';
+        }
+      } else if (error.code === 'ECONNABORTED') {
+        errorMessage = 'Reprocessing timed out. The profile may contain many documents. Please try again.';
+      } else if (error.request) {
+        errorMessage = 'Failed to connect to server. Please ensure the backend is running.';
+      }
+      
+      setMessage({ type: 'error', text: errorMessage });
+      setProgress('');
+    } finally {
+      setReprocessingUserId(null);
     }
   };
 
@@ -570,10 +614,15 @@ const UserProfile: React.FC = () => {
                           </button>
                           <button
                             onClick={() => handleProcessUser(user.id)}
-                            className="text-indigo-600 hover:text-indigo-800 flex items-center text-sm"
+                            disabled={reprocessingUserId === user.id}
+                            className={`flex items-center text-sm ${
+                              reprocessingUserId === user.id 
+                                ? 'text-gray-400 cursor-not-allowed' 
+                                : 'text-indigo-600 hover:text-indigo-800'
+                            }`}
                           >
-                            <RefreshCw className="h-4 w-4 mr-1" />
-                            Reprocess
+                            <RefreshCw className={`h-4 w-4 mr-1 ${reprocessingUserId === user.id ? 'animate-spin' : ''}`} />
+                            {reprocessingUserId === user.id ? 'Reprocessing...' : 'Reprocess'}
                           </button>
                           <button
                             onClick={() => handleDeleteUser(user.id, user.name)}
@@ -633,6 +682,16 @@ const UserProfile: React.FC = () => {
                             )}
                           </div>
                         ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Reprocessing Progress */}
+                  {reprocessingUserId === user.id && progress && (
+                    <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                      <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2" />
+                        <span className="text-sm text-blue-800">{progress}</span>
                       </div>
                     </div>
                   )}
