@@ -278,24 +278,22 @@ class FundingOpportunitiesManager:
                 if exp_date:
                     return exp_date < now, exp_date
                     
-        # If no date found in standard fields, try Gemini extraction (disable for now to save API calls)
-        # Uncomment the following lines to enable Gemini deadline extraction
-        # gemini_deadline = self._extract_deadline_with_gemini(opportunity)
-        # if gemini_deadline and gemini_deadline not in ['NO_DEADLINE', 'ANYTIME']:
-        #     # Add the extracted deadline to the opportunity
-        #     opportunity['close_date'] = gemini_deadline
-        #     exp_date = self._parse_date(gemini_deadline)
-        #     if exp_date:
-        #         return exp_date < now, exp_date
-        # elif gemini_deadline == 'ANYTIME':
-        #     # Set far future date for continuous opportunities
-        #     opportunity['close_date'] = 'Continuous'
-        #     far_future = datetime(2030, 12, 31, tzinfo=timezone.utc)
-        #     return False, far_future
+        # If no date found in standard fields, try Gemini extraction
+        gemini_deadline = self._extract_deadline_with_gemini(opportunity)
+        if gemini_deadline and gemini_deadline not in ['NO_DEADLINE', 'ANYTIME']:
+            # Add the extracted deadline to the opportunity
+            opportunity['close_date'] = gemini_deadline
+            exp_date = self._parse_date(gemini_deadline)
+            if exp_date:
+                return exp_date < now, exp_date
+        elif gemini_deadline == 'ANYTIME':
+            # Set far future date for continuous opportunities
+            opportunity['close_date'] = 'Continuous'
+            far_future = datetime(2030, 12, 31, tzinfo=timezone.utc)
+            return False, far_future
             
-        # If no date found at all, consider not expired but flag it
-        opportunity['close_date'] = 'Not specified'
-        return False, None
+        # If no deadline found at all, mark as invalid (will be discarded)
+        return True, None  # Mark as expired to discard it
     
     def process_csv_files(self, batch_size: int = 20) -> Dict[str, Any]:
         """
@@ -464,22 +462,31 @@ class FundingOpportunitiesManager:
                 })
             
             for i, opp in enumerate(opportunities):
-                # Check if expired
+                # Check if expired or has no deadline
                 is_expired, exp_date = self._is_expired(opp)
                 
                 if is_expired:
                     summary["expired_skipped"] += 1
                     processed += 1
+                    
+                    if exp_date:
+                        reason = f"Expired on {exp_date.strftime('%Y-%m-%d')}"
+                        debug_msg = f"Skipped expired: {opp.get('title', 'Unknown')[:50]}..."
+                    else:
+                        reason = "No deadline found - opportunity discarded"
+                        debug_msg = f"Skipped no deadline: {opp.get('title', 'Unknown')[:50]}..."
+                    
                     summary["unprocessed"].append({
                         "title": opp.get('title', 'Unknown'),
                         "agency": opp.get('agency', 'Unknown'),
-                        "reason": f"Expired on {exp_date.strftime('%Y-%m-%d') if exp_date else 'unknown date'}"
+                        "reason": reason
                     })
+                    
                     if progress_callback and i < 5:  # Log first 5 for debugging
                         progress_callback({
                             "status": "processing",
                             "stage": "debug",
-                            "message": f"Skipped expired: {opp.get('title', 'Unknown')[:50]}..."
+                            "message": debug_msg
                         })
                     continue
                 
@@ -780,10 +787,13 @@ class FundingOpportunitiesManager:
             # Enrich opportunity with URL content
             opp = self._enrich_opportunity_with_url(opp)
             
-            # Check if expired
+            # Check if expired or has no deadline
             is_expired, exp_date = self._is_expired(opp)
             if is_expired:
-                print(f"  ⏰ Skipping expired: {opp['title'][:50]}... (expired: {exp_date})")
+                if exp_date:
+                    print(f"  ⏰ Skipping expired: {opp['title'][:50]}... (expired: {exp_date})")
+                else:
+                    print(f"  ❌ Skipping no deadline: {opp['title'][:50]}... (no deadline found)")
                 summary["expired"] += 1
                 continue
             

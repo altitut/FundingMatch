@@ -25,6 +25,7 @@ from funding_opportunities_manager import FundingOpportunitiesManager
 from user_profile_manager import UserProfileManager
 from rag_explainer import RAGExplainer
 from vector_database import VectorDatabaseManager
+from matching_results_manager import MatchingResultsManager
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})  # Enable CORS for all origins on API routes
@@ -45,6 +46,7 @@ def allowed_file(filename):
 funding_manager = FundingOpportunitiesManager()
 user_manager = UserProfileManager()
 vector_db = VectorDatabaseManager()
+matching_results = MatchingResultsManager()
 
 
 @app.route('/api/health', methods=['GET'])
@@ -884,6 +886,24 @@ def create_profile():
         }), 500
 
 
+@app.route('/api/match/saved/<user_id>', methods=['GET'])
+def get_saved_matches(user_id):
+    """Get saved matches for a user"""
+    try:
+        limit = request.args.get('limit', type=int)
+        matches = matching_results.get_matches(user_id, limit)
+        
+        return jsonify({
+            'success': True,
+            'matches': matches,
+            'total': len(matches)
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 @app.route('/api/match', methods=['POST'])
 def match_opportunities():
     """Match user profile with funding opportunities"""
@@ -1003,6 +1023,12 @@ def match_opportunities():
         
         # Sort by confidence score
         formatted_matches.sort(key=lambda x: x['confidence_score'], reverse=True)
+        
+        # Save matches to user database
+        try:
+            matching_results.save_matches(user_id, formatted_matches)
+        except Exception as e:
+            print(f"Warning: Failed to save matches to database: {e}")
         
         return jsonify({
             'success': True,

@@ -287,13 +287,18 @@ const Matching: React.FC = () => {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {matches.map((match, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-lg shadow hover:shadow-md transition-shadow"
-                >
-                  <div className="p-6">
+            <div className="space-y-6">
+              {/* Top 10 as Cards */}
+              {matches.length > 0 && (
+                <>
+                  <h4 className="text-md font-semibold text-gray-700">Top Matches</h4>
+                  <div className="space-y-4">
+                    {matches.slice(0, 10).map((match, index) => (
+                      <div
+                        key={index}
+                        className="bg-white rounded-lg shadow hover:shadow-md transition-shadow"
+                      >
+                        <div className="p-6">
                     <div className="flex items-start justify-between mb-3">
                       <h4 className="text-lg font-semibold text-gray-900 flex-1 pr-4">
                         {match.title}
@@ -457,7 +462,76 @@ const Matching: React.FC = () => {
                     )}
                   </div>
                 </div>
-              ))}
+                    ))}
+                  </div>
+                </>
+              )}
+              
+              {/* Remaining as Simple List */}
+              {matches.length > 10 && (
+                <>
+                  <h4 className="text-md font-semibold text-gray-700 mt-8">Additional Matches</h4>
+                  <div className="bg-white rounded-lg shadow overflow-hidden">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Agency</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline</th>
+                          <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {matches.slice(10).map((match, index) => (
+                          <tr key={index + 10} className="hover:bg-gray-50">
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {index + 11}
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap">
+                              <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                match.confidence_score >= 70 ? 'bg-green-100 text-green-800' :
+                                match.confidence_score >= 50 ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-gray-100 text-gray-800'
+                              }`}>
+                                {match.confidence_score}%
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-900">
+                              <div className="max-w-lg truncate" title={match.title}>
+                                {match.title}
+                              </div>
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                              {match.agency}
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600">
+                              {match.deadline || 'Not specified'}
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-center text-sm font-medium">
+                              <a
+                                href={match.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-indigo-600 hover:text-indigo-900 mr-3"
+                              >
+                                <ExternalLink className="h-4 w-4 inline" />
+                              </a>
+                              <button
+                                onClick={() => viewDetails(index + 10)}
+                                className="text-gray-600 hover:text-gray-900"
+                              >
+                                <ChevronRight className="h-4 w-4 inline" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>
