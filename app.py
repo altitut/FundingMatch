@@ -582,6 +582,30 @@ def update_profile():
             with open(json_file, 'w') as f:
                 json.dump(profile_data, f)
         
+        # Update the JSON file with new URLs BEFORE creating profile
+        if urls:
+            try:
+                with open(json_file, 'r') as f:
+                    json_data = json.load(f)
+                
+                # Get existing links
+                existing_links = json_data.get('person', {}).get('links', [])
+                existing_urls = [link['url'] for link in existing_links]
+                
+                # Add new URLs
+                for url in urls:
+                    if url and url not in existing_urls:
+                        existing_links.append({"url": url, "type": "web"})
+                
+                # Update JSON data
+                json_data.setdefault('person', {})['links'] = existing_links
+                
+                # Save updated JSON
+                with open(json_file, 'w') as f:
+                    json.dump(json_data, f, indent=2)
+            except Exception as e:
+                print(f"Warning: Could not update JSON file with URLs: {e}")
+        
         # Get all PDF files to process
         pdf_files = []
         for file_info in files:
@@ -593,38 +617,17 @@ def update_profile():
                 if os.path.exists(filepath):
                     pdf_files.append(filepath)
         
-        # Create updated profile with all documents
+        # Create updated profile with all documents (URLs will be processed from JSON)
         profile = user_manager.create_user_profile(json_file, pdf_files)
-        
-        # Update the URLs in the profile
-        if urls:
-            existing_links = profile.get('urls', [])
-            for url in urls:
-                if url and not any(link['url'] == url for link in existing_links):
-                    existing_links.append({"url": url, "type": "web"})
-            profile['urls'] = existing_links
         
         # Store updated profile
         success = user_manager.store_user_profile(profile)
         
         if success:
-            # Update the JSON file to include all URLs
-            try:
-                with open(json_file, 'r') as f:
-                    json_data = json.load(f)
-                
-                # Update links in JSON data
-                json_data.setdefault('person', {})['links'] = profile.get('urls', [])
-                
-                # Save updated JSON
-                with open(json_file, 'w') as f:
-                    json.dump(json_data, f, indent=2)
-            except Exception as e:
-                print(f"Warning: Could not update JSON file with URLs: {e}")
-            
             # Count new items added
             new_pdf_count = len([f for f in files if f.get('type') == 'pdf' and 'uploads/' not in f.get('path', '')])
-            new_url_count = len([u for u in urls if u.strip() and not any(link['url'] == u for link in user_data['metadatas'][0].get('urls', []))])
+            # Count URLs that were actually new (not already in existing_urls)
+            new_url_count = len([u for u in urls if u.strip()])
             total_new_items = new_pdf_count + new_url_count
             
             return jsonify({

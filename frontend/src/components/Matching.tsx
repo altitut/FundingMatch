@@ -52,6 +52,26 @@ const Matching: React.FC = () => {
     fetchTotalOpportunities();
   }, []);
 
+  useEffect(() => {
+    // Load saved matches when user changes
+    if (selectedUser) {
+      loadSavedMatches(selectedUser);
+    }
+  }, [selectedUser]);
+
+  const loadSavedMatches = async (userId: string) => {
+    try {
+      const response = await axios.get(`${API_BASE}/match/saved/${userId}`);
+      if (response.data.success && response.data.matches.length > 0) {
+        setMatches(response.data.matches);
+        setHasSearched(true);
+      }
+    } catch (error) {
+      // Silently fail - no saved matches
+      console.log('No saved matches found for user');
+    }
+  };
+
   const fetchUsers = async () => {
     try {
       const response = await axios.get(`${API_BASE}/users`);
