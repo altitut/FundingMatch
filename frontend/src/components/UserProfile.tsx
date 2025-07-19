@@ -319,7 +319,7 @@ const UserProfile: React.FC = () => {
 
   const handleProcessUser = async (userId: string) => {
     // Find the user name for better feedback
-    const user = users.find(u => u.id === userId);
+    const user = existingUsers.find(u => u.id === userId);
     const userName = user?.name || 'User';
     
     setReprocessingUserId(userId);
