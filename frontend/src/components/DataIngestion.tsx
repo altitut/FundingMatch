@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, CheckCircle, AlertCircle, Database, ExternalLink, Calendar } from 'lucide-react';
+import { Upload, CheckCircle, AlertCircle, Database, ExternalLink, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 
 const API_BASE = 'http://localhost:5001/api';
@@ -48,11 +48,37 @@ const DataIngestion: React.FC = () => {
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [unprocessedOpportunities, setUnprocessedOpportunities] = useState<UnprocessedOpportunity[]>([]);
   const [activeTab, setActiveTab] = useState<'processed' | 'unprocessed'>('processed');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 100;
 
   useEffect(() => {
     fetchStats();
     fetchOpportunities();
   }, []);
+
+  // Calculate pagination values
+  const totalPages = Math.ceil(
+    activeTab === 'processed' 
+      ? opportunities.length / itemsPerPage 
+      : unprocessedOpportunities.length / itemsPerPage
+  );
+  
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  
+  const paginatedOpportunities = opportunities.slice(startIndex, endIndex);
+  const paginatedUnprocessedOpportunities = unprocessedOpportunities.slice(startIndex, endIndex);
+  
+  // Reset page when switching tabs
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab]);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
 
   const fetchStats = async () => {
     try {
@@ -370,7 +396,15 @@ const DataIngestion: React.FC = () => {
       {(opportunities.length > 0 || unprocessedOpportunities.length > 0) && (
         <div className="bg-white rounded-lg shadow">
           <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Funding Opportunities</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Funding Opportunities</h3>
+              {/* Page info */}
+              {totalPages > 1 && (
+                <span className="text-sm text-gray-600">
+                  Page {currentPage} of {totalPages} (Groups of {itemsPerPage})
+                </span>
+              )}
+            </div>
             
             {/* Tabs */}
             <div className="border-b border-gray-200 mb-4">
@@ -424,10 +458,10 @@ const DataIngestion: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {opportunities.map((opp, index) => (
+                    {paginatedOpportunities.map((opp, index) => (
                       <tr key={opp.id}>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                          {index + 1}
+                          {startIndex + index + 1}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                           {opp.topic_number || opp.id.substring(0, 8)}
@@ -483,10 +517,10 @@ const DataIngestion: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {unprocessedOpportunities.map((opp, index) => (
+                    {paginatedUnprocessedOpportunities.map((opp, index) => (
                       <tr key={index}>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                          {index + 1}
+                          {startIndex + index + 1}
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-900">
                           <div className="max-w-xs truncate" title={opp.title}>
@@ -508,6 +542,112 @@ const DataIngestion: React.FC = () => {
                 </table>
               )}
             </div>
+            
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="mt-4 flex items-center justify-between px-4 py-3 bg-gray-50 border-t">
+                <div className="flex-1 flex justify-between sm:hidden">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                      currentPage === 1
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                      currentPage === totalPages
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    Next
+                  </button>
+                </div>
+                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm text-gray-700">
+                      Showing{' '}
+                      <span className="font-medium">{startIndex + 1}</span> to{' '}
+                      <span className="font-medium">
+                        {Math.min(
+                          endIndex,
+                          activeTab === 'processed' ? opportunities.length : unprocessedOpportunities.length
+                        )}
+                      </span>{' '}
+                      of{' '}
+                      <span className="font-medium">
+                        {activeTab === 'processed' ? opportunities.length : unprocessedOpportunities.length}
+                      </span>{' '}
+                      results
+                    </p>
+                  </div>
+                  <div>
+                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                      <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 text-sm font-medium ${
+                          currentPage === 1
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-white text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        <span className="sr-only">Previous</span>
+                        <ChevronLeft className="h-5 w-5" />
+                      </button>
+                      
+                      {/* Page numbers */}
+                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                        let pageNum: number;
+                        if (totalPages <= 5) {
+                          pageNum = i + 1;
+                        } else if (currentPage <= 3) {
+                          pageNum = i + 1;
+                        } else if (currentPage >= totalPages - 2) {
+                          pageNum = totalPages - 4 + i;
+                        } else {
+                          pageNum = currentPage - 2 + i;
+                        }
+                        
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => handlePageChange(pageNum)}
+                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                              pageNum === currentPage
+                                ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+                      
+                      <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 text-sm font-medium ${
+                          currentPage === totalPages
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-white text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        <span className="sr-only">Next</span>
+                        <ChevronRight className="h-5 w-5" />
+                      </button>
+                    </nav>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -88,6 +88,36 @@ def get_stats():
             funding_manager.processed_ids["opportunities"] = {}
             funding_manager._save_processed_ids()
         
+        # Also check for researchers in the database if count is 0
+        if db_stats['researchers'] == 0:
+            # Check files to get user count
+            upload_dir = app.config['UPLOAD_FOLDER']
+            user_count = 0
+            
+            if os.path.exists(upload_dir):
+                # Count unique users from JSON files
+                seen_users = set()
+                json_files = [f for f in os.listdir(upload_dir) if f.endswith('.json')]
+                for json_file in json_files:
+                    try:
+                        with open(os.path.join(upload_dir, json_file), 'r') as f:
+                            data = json.load(f)
+                            person = data.get('person', {})
+                            name = person.get('name', '')
+                            if name:
+                                # Generate same ID as user_profile_manager
+                                import hashlib
+                                user_id = hashlib.md5(name.encode()).hexdigest()
+                                seen_users.add(user_id)
+                    except:
+                        pass
+                
+                user_count = len(seen_users)
+            
+            # Update stats with file-based count if higher
+            if user_count > db_stats['researchers']:
+                db_stats['researchers'] = user_count
+        
         return jsonify({
             'success': True,
             'stats': db_stats
@@ -108,6 +138,32 @@ def get_opportunities():
         return jsonify({
             'success': True,
             'opportunities': opportunities
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/cleanup-expired', methods=['POST'])
+def cleanup_expired_opportunities():
+    """Remove expired funding opportunities from the database"""
+    try:
+        # Get force parameter from request
+        force = request.json.get('force', False) if request.is_json else False
+        
+        # Run cleanup
+        removed_count = funding_manager.remove_expired_opportunities(force=force)
+        
+        # Get updated statistics
+        stats = funding_manager.get_statistics()
+        
+        return jsonify({
+            'success': True,
+            'removed_count': removed_count,
+            'message': f'Removed {removed_count} expired opportunities',
+            'stats': stats
         })
     except Exception as e:
         return jsonify({
@@ -199,18 +255,27 @@ def get_users():
                             'name': file,
                             'status': 'processed'
                         })
-                    elif file.endswith('.json') and user.get('name') in file:
-                        # Parse JSON to get URLs
+                    elif file.endswith('.json'):
+                        # Parse JSON to check if it belongs to this user
                         try:
                             with open(os.path.join(upload_dir, file), 'r') as f:
                                 data = json.load(f)
-                                links = data.get('person', {}).get('links', [])
-                                for link in links:
-                                    user_data['urls'].append({
-                                        'url': link.get('url', ''),
-                                        'type': link.get('type', ''),
-                                        'status': 'processed'
-                                    })
+                                person = data.get('person', {})
+                                json_name = person.get('name', '')
+                                
+                                # Generate ID to match user
+                                import hashlib
+                                json_user_id = hashlib.md5(json_name.encode()).hexdigest() if json_name else ''
+                                
+                                if json_user_id == user.get('id'):
+                                    # This JSON belongs to this user - get URLs
+                                    links = person.get('links', [])
+                                    for link in links:
+                                        user_data['urls'].append({
+                                            'url': link.get('url', ''),
+                                            'type': link.get('type', 'web'),
+                                            'status': link.get('status', 'processed')
+                                        })
                         except:
                             pass
             
@@ -268,6 +333,163 @@ def delete_user(user_id):
             'success': True,
             'message': 'User and associated data removed successfully'
         })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/profile/remove-document', methods=['POST'])
+def remove_document_from_profile():
+    """Remove a document from user profile and update embeddings"""
+    try:
+        data = request.json
+        user_id = data.get('user_id')
+        filename = data.get('filename')
+        
+        if not user_id or not filename:
+            return jsonify({'success': False, 'error': 'Missing user_id or filename'}), 400
+        
+        # Get existing user profile
+        user_data = vector_db.researchers.get(ids=[user_id], include=['metadatas', 'documents'])
+        if not user_data or not user_data.get('metadatas'):
+            return jsonify({'success': False, 'error': 'User not found'}), 404
+        
+        # Find the user's JSON file
+        json_file = None
+        upload_dir = app.config['UPLOAD_FOLDER']
+        
+        # Try to find matching JSON file by checking content
+        json_files = [f for f in os.listdir(upload_dir) if f.endswith('.json')]
+        for jf in json_files:
+            try:
+                with open(os.path.join(upload_dir, jf), 'r') as f:
+                    json_data = json.load(f)
+                    person = json_data.get('person', {})
+                    name = person.get('name', '')
+                    # Generate ID same way as user_profile_manager
+                    import hashlib
+                    file_user_id = hashlib.md5(name.encode()).hexdigest()
+                    if file_user_id == user_id:
+                        json_file = os.path.join(upload_dir, jf)
+                        break
+            except:
+                pass
+        
+        if not json_file:
+            return jsonify({'success': False, 'error': 'User profile JSON not found'}), 404
+        
+        # Remove the physical file
+        file_path = os.path.join(upload_dir, filename)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        
+        # Get remaining PDF files
+        pdf_files = [os.path.join(upload_dir, f) 
+                    for f in os.listdir(upload_dir) 
+                    if f.endswith('.pdf') and f != filename]
+        
+        # Recreate profile with remaining documents
+        profile = user_manager.create_user_profile(json_file, pdf_files)
+        
+        # Store updated profile (this will update embeddings)
+        success = user_manager.store_user_profile(profile)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': 'Document removed and profile updated successfully'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to update profile after document removal'
+            }), 500
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/profile/remove-url', methods=['POST'])
+def remove_url_from_profile():
+    """Remove a URL from user profile and update embeddings"""
+    try:
+        data = request.json
+        user_id = data.get('user_id')
+        url_to_remove = data.get('url')
+        
+        if not user_id or not url_to_remove:
+            return jsonify({'success': False, 'error': 'Missing user_id or url'}), 400
+        
+        # Get existing user profile
+        user_data = vector_db.researchers.get(ids=[user_id], include=['metadatas', 'documents'])
+        if not user_data or not user_data.get('metadatas'):
+            return jsonify({'success': False, 'error': 'User not found'}), 404
+        
+        # Find the user's JSON file
+        json_file = None
+        upload_dir = app.config['UPLOAD_FOLDER']
+        
+        # Try to find matching JSON file by checking content
+        json_files = [f for f in os.listdir(upload_dir) if f.endswith('.json')]
+        for jf in json_files:
+            try:
+                json_path = os.path.join(upload_dir, jf)
+                with open(json_path, 'r') as f:
+                    json_data = json.load(f)
+                    person = json_data.get('person', {})
+                    name = person.get('name', '')
+                    # Generate ID same way as user_profile_manager
+                    import hashlib
+                    file_user_id = hashlib.md5(name.encode()).hexdigest()
+                    if file_user_id == user_id:
+                        json_file = json_path
+                        
+                        # Remove the URL from the JSON
+                        links = person.get('links', [])
+                        updated_links = [link for link in links if link.get('url') != url_to_remove]
+                        
+                        if len(updated_links) < len(links):
+                            # URL was found and removed
+                            person['links'] = updated_links
+                            
+                            # Save updated JSON
+                            with open(json_path, 'w') as f_write:
+                                json.dump(json_data, f_write, indent=2)
+                            
+                            break
+            except:
+                pass
+        
+        if not json_file:
+            return jsonify({'success': False, 'error': 'User profile JSON not found'}), 404
+        
+        # Get remaining PDF files
+        pdf_files = [os.path.join(upload_dir, f) 
+                    for f in os.listdir(upload_dir) 
+                    if f.endswith('.pdf')]
+        
+        # Recreate profile with updated URLs
+        profile = user_manager.create_user_profile(json_file, pdf_files)
+        
+        # Store updated profile (this will update embeddings)
+        success = user_manager.store_user_profile(profile)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': 'URL removed and profile updated successfully'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to update profile after URL removal'
+            }), 500
+        
     except Exception as e:
         return jsonify({
             'success': False,
@@ -398,10 +620,17 @@ def update_profile():
             except Exception as e:
                 print(f"Warning: Could not update JSON file with URLs: {e}")
             
+            # Count new items added
+            new_pdf_count = len([f for f in files if f.get('type') == 'pdf' and 'uploads/' not in f.get('path', '')])
+            new_url_count = len([u for u in urls if u.strip() and not any(link['url'] == u for link in user_data['metadatas'][0].get('urls', []))])
+            total_new_items = new_pdf_count + new_url_count
+            
             return jsonify({
                 'success': True,
                 'message': 'Profile updated successfully',
-                'documents_processed': len(pdf_files)
+                'documents_processed': new_pdf_count,
+                'urls_processed': new_url_count,
+                'total_processed': total_new_items
             })
         else:
             return jsonify({

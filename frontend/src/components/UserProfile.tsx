@@ -298,6 +298,24 @@ const UserProfile: React.FC = () => {
     }
   };
 
+  const handleRemoveUrl = async (userId: string, url: string) => {
+    try {
+      const response = await axios.post(`${API_BASE}/profile/remove-url`, {
+        user_id: userId,
+        url,
+      });
+      if (response.data.success) {
+        setMessage({ type: 'success', text: 'URL removed successfully' });
+        fetchUsers();
+      } else {
+        setMessage({ type: 'error', text: response.data.error || 'Failed to remove URL' });
+      }
+    } catch (error) {
+      console.error('Failed to remove URL:', error);
+      setMessage({ type: 'error', text: 'Failed to remove URL. Please try again.' });
+    }
+  };
+
   const handleProcessUser = async (userId: string) => {
     try {
       const response = await axios.post(`${API_BASE}/profile/process`, {
@@ -458,9 +476,23 @@ const UserProfile: React.FC = () => {
       });
 
       if (response.data.success) {
+        const docsProcessed = response.data.documents_processed || 0;
+        const urlsProcessed = response.data.urls_processed || 0;
+        const totalProcessed = response.data.total_processed || (docsProcessed + urlsProcessed);
+        
+        let messageText = 'Profile updated successfully! ';
+        if (totalProcessed > 0) {
+          const parts = [];
+          if (docsProcessed > 0) parts.push(`${docsProcessed} new document${docsProcessed !== 1 ? 's' : ''}`);
+          if (urlsProcessed > 0) parts.push(`${urlsProcessed} new URL${urlsProcessed !== 1 ? 's' : ''}`);
+          messageText += `Added ${parts.join(' and ')}.`;
+        } else {
+          messageText += 'No new items were added (all items may already exist).';
+        }
+        
         setMessage({
           type: 'success',
-          text: `Profile updated successfully! Added ${editFiles.length} new documents.`,
+          text: messageText,
         });
         
         // Reset edit state
@@ -566,12 +598,14 @@ const UserProfile: React.FC = () => {
                               <span className="text-sm text-gray-600">{doc.name}</span>
                               <span className="ml-2 text-xs text-green-600">✓ {doc.status}</span>
                             </div>
-                            <button
-                              onClick={() => handleRemoveDocument(user.id, doc.name)}
-                              className="text-red-600 hover:text-red-800"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </button>
+                            {editingUserId === user.id && (
+                              <button
+                                onClick={() => handleRemoveDocument(user.id, doc.name)}
+                                className="text-red-600 hover:text-red-800"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -583,10 +617,20 @@ const UserProfile: React.FC = () => {
                       <p className="text-sm font-medium text-gray-700 mb-1">URLs:</p>
                       <div className="space-y-1">
                         {user.urls.map((url, idx) => (
-                          <div key={idx} className="flex items-center bg-gray-50 rounded px-3 py-1">
-                            <Link className="h-4 w-4 text-gray-400 mr-2" />
-                            <span className="text-sm text-gray-600 truncate">{url.url}</span>
-                            <span className="ml-2 text-xs text-green-600">✓ {url.status}</span>
+                          <div key={idx} className="flex items-center justify-between bg-gray-50 rounded px-3 py-1">
+                            <div className="flex items-center">
+                              <Link className="h-4 w-4 text-gray-400 mr-2" />
+                              <span className="text-sm text-gray-600 truncate">{url.url}</span>
+                              <span className="ml-2 text-xs text-green-600">✓ {url.status}</span>
+                            </div>
+                            {editingUserId === user.id && (
+                              <button
+                                onClick={() => handleRemoveUrl(user.id, url.url)}
+                                className="text-red-600 hover:text-red-800"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </button>
+                            )}
                           </div>
                         ))}
                       </div>

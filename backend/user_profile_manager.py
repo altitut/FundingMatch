@@ -89,6 +89,7 @@ class UserProfileManager:
         
         # 4. Process URLs
         url_contents = []
+        processed_urls = []
         for link in profile['urls']:
             url = link.get('url', '')
             if url:
@@ -96,6 +97,15 @@ class UserProfileManager:
                 content = self.url_fetcher.fetch_url_content(url)
                 if content:
                     url_contents.append(f"From {link.get('type', 'web')}: {content.get('text', '')[:500]}")
+                    # Mark URL as processed
+                    link['status'] = 'processed'
+                    processed_urls.append(link)
+                else:
+                    # Mark URL as failed
+                    link['status'] = 'failed'
+        
+        # Update URLs in profile with status
+        profile['urls'] = processed_urls if processed_urls else profile['urls']
         
         # 5. Create combined text for embedding
         combined_parts = [

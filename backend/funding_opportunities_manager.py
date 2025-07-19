@@ -354,8 +354,8 @@ class FundingOpportunitiesManager:
                 print(f"❌ {error_msg}")
                 summary["errors"].append(error_msg)
         
-        # Clean up expired opportunities
-        removed = self.remove_expired_opportunities()
+        # Clean up expired opportunities (force=True to ensure cleanup after processing)
+        removed = self.remove_expired_opportunities(force=True)
         summary["expired_removed"] = removed
         
         # Save processed IDs
@@ -644,6 +644,17 @@ class FundingOpportunitiesManager:
             ingested_path = self.ingested_dir / filename
             csv_path.rename(ingested_path)
             
+            # Clean up expired opportunities after processing
+            if progress_callback:
+                progress_callback({
+                    "status": "processing",
+                    "stage": "cleanup",
+                    "message": "Checking for expired opportunities..."
+                })
+            
+            expired_removed = self.remove_expired_opportunities(force=True)
+            summary["expired_removed"] = expired_removed
+            
             # Send completion
             if progress_callback:
                 progress_callback({
@@ -827,10 +838,13 @@ class FundingOpportunitiesManager:
         
         return summary
     
-    def remove_expired_opportunities(self) -> int:
+    def remove_expired_opportunities(self, force: bool = False) -> int:
         """
-        Remove expired opportunities from the database
+        Remove expired opportunities from both tracking and vector database
         
+        Args:
+            force: Force cleanup even if it was run recently
+            
         Returns:
             Number of opportunities removed
         """
@@ -838,40 +852,97 @@ class FundingOpportunitiesManager:
         now = datetime.now(timezone.utc)
         
         # Check if we should run cleanup (once per day)
-        last_cleanup = self.processed_ids.get("last_cleanup")
-        if last_cleanup:
-            last_cleanup_date = datetime.fromisoformat(last_cleanup)
-            if (now - last_cleanup_date).days < 1:
-                return 0
+        if not force:
+            last_cleanup = self.processed_ids.get("last_cleanup")
+            if last_cleanup:
+                last_cleanup_date = datetime.fromisoformat(last_cleanup)
+                if (now - last_cleanup_date).days < 1:
+                    print("Cleanup already run today. Use force=True to override.")
+                    return 0
         
         print("\nChecking for expired opportunities...")
         
-        # Get all opportunities from database
-        # Note: ChromaDB doesn't have a direct way to iterate all items
-        # So we'll check our tracked opportunities
+        # First, check tracked opportunities for expired ones
         expired_ids = []
+        expired_details = []
         
-        for opp_id, opp_info in self.processed_ids["opportunities"].items():
+        for opp_id, opp_info in list(self.processed_ids["opportunities"].items()):
             if opp_info.get("expiration_date"):
                 exp_date = datetime.fromisoformat(opp_info["expiration_date"])
                 if exp_date < now:
                     expired_ids.append(opp_id)
+                    expired_details.append({
+                        'id': opp_id,
+                        'title': opp_info.get('title', 'Unknown'),
+                        'agency': opp_info.get('agency', 'Unknown'),
+                        'expired_date': exp_date.strftime('%Y-%m-%d')
+                    })
         
-        # Remove expired opportunities
-        for opp_id in expired_ids:
+        # Also check opportunities in vector DB that might not be in tracking
+        try:
+            all_opportunities = self.vector_db.get_all_opportunities()
+            for opp in all_opportunities:
+                if opp['id'] not in expired_ids:  # Avoid duplicates
+                    deadline = opp.get('deadline', '')
+                    if deadline and deadline != 'Not specified':
+                        try:
+                            exp_date = self._parse_date(deadline)
+                            if exp_date and exp_date < now:
+                                expired_ids.append(opp['id'])
+                                expired_details.append({
+                                    'id': opp['id'],
+                                    'title': opp.get('title', 'Unknown'),
+                                    'agency': opp.get('agency', 'Unknown'),
+                                    'expired_date': exp_date.strftime('%Y-%m-%d')
+                                })
+                        except:
+                            pass
+        except Exception as e:
+            print(f"  ⚠️ Error checking vector DB for expired opportunities: {e}")
+        
+        # Remove expired opportunities from both tracking and vector database
+        if expired_ids:
+            print(f"  Found {len(expired_ids)} expired opportunities to remove:")
+            for detail in expired_details[:5]:  # Show first 5
+                print(f"    - {detail['title'][:50]}... ({detail['agency']}) - Expired: {detail['expired_date']}")
+            if len(expired_details) > 5:
+                print(f"    ... and {len(expired_details) - 5} more")
+            
+            # Batch delete from vector database
             try:
-                # ChromaDB doesn't have a direct delete by ID for the current version
-                # We'll mark as removed in our tracking
-                del self.processed_ids["opportunities"][opp_id]
-                removed_count += 1
+                # ChromaDB's delete method accepts a list of IDs
+                self.vector_db.opportunities.delete(ids=expired_ids)
+                print(f"  ✓ Removed {len(expired_ids)} opportunities from vector database")
+                
+                # Remove from tracking
+                for opp_id in expired_ids:
+                    if opp_id in self.processed_ids["opportunities"]:
+                        del self.processed_ids["opportunities"][opp_id]
+                
+                removed_count = len(expired_ids)
+                
             except Exception as e:
-                print(f"  ❌ Error removing {opp_id}: {e}")
+                print(f"  ❌ Error removing opportunities from vector DB: {e}")
+                # Try individual removal as fallback
+                for opp_id in expired_ids:
+                    try:
+                        self.vector_db.opportunities.delete(ids=[opp_id])
+                        if opp_id in self.processed_ids["opportunities"]:
+                            del self.processed_ids["opportunities"][opp_id]
+                        removed_count += 1
+                    except Exception as e2:
+                        print(f"  ❌ Error removing {opp_id}: {e2}")
         
         if removed_count > 0:
-            print(f"  ✓ Removed {removed_count} expired opportunities")
+            print(f"  ✓ Successfully removed {removed_count} expired opportunities")
+            # Save updated tracking
+            self._save_processed_ids()
+        else:
+            print("  ✓ No expired opportunities found")
         
         # Update last cleanup time
         self.processed_ids["last_cleanup"] = now.isoformat()
+        self._save_processed_ids()
         
         return removed_count
     
