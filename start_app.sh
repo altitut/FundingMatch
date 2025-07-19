@@ -16,7 +16,7 @@ kill_port() {
 
 # Clear ports before starting
 echo "🧹 Clearing ports..."
-kill_port 5001  # Flask backend
+kill_port 8787  # Flask backend
 kill_port 3000  # React frontend
 
 # Kill any existing python app.py processes
@@ -33,7 +33,7 @@ source venv/bin/activate 2>/dev/null || . venv/Scripts/activate 2>/dev/null
 
 # Install Python dependencies
 echo "📦 Installing Python dependencies..."
-pip install -r requirements.txt -q
+pip install -r backend/requirements.txt -q
 
 # Start Flask backend
 echo "🔧 Starting Flask backend..."
@@ -49,7 +49,7 @@ if ! kill -0 $FLASK_PID 2>/dev/null; then
     exit 1
 fi
 
-echo "✅ Flask backend running on http://localhost:5001"
+echo "✅ Flask backend running on http://localhost:8787"
 
 # Start React frontend
 echo "⚛️  Starting React frontend..."
@@ -71,7 +71,7 @@ sleep 3
 echo ""
 echo "✅ FundingMatch Application Started!"
 echo "===================================="
-echo "🔧 Backend: http://localhost:5001"
+echo "🔧 Backend: http://localhost:8787"
 echo "⚛️  Frontend: http://localhost:3000"
 echo ""
 echo "Press Ctrl+C to stop the application"

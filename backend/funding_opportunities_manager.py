@@ -16,26 +16,31 @@ try:
     from .embeddings_manager import GeminiEmbeddingsManager
     from .vector_database import VectorDatabaseManager
     from .url_content_fetcher import URLContentFetcher
+    from .rate_limiter import gemini_rate_limiter
 except ImportError:
     from embeddings_manager import GeminiEmbeddingsManager
     from vector_database import VectorDatabaseManager
     from url_content_fetcher import URLContentFetcher
+    from rate_limiter import gemini_rate_limiter
 
 
 class FundingOpportunitiesManager:
     """Manages funding opportunities lifecycle including processing, storage, and expiration"""
     
     def __init__(self, funding_dir: str = "FundingOpportunities", 
-                 ingested_dir: str = "FundingOpportunities/Ingested"):
+                 ingested_dir: str = "FundingOpportunities/Ingested",
+                 progress_callback: Optional[callable] = None):
         """
         Initialize the funding opportunities manager
         
         Args:
             funding_dir: Directory containing CSV files to process
             ingested_dir: Directory to move processed CSV files
+            progress_callback: Optional callback for progress updates
         """
         self.funding_dir = Path(funding_dir)
         self.ingested_dir = Path(ingested_dir)
+        self.progress_callback = progress_callback
         
         # Create directories if they don't exist
         self.funding_dir.mkdir(exist_ok=True)
@@ -184,6 +189,36 @@ class FundingOpportunitiesManager:
         # Clean the date string
         date_string = date_string.strip()
         
+        # Handle multiple dates like "2025-09-16, 2025-09-16" or "2025-03-15, 2025-09-15"
+        if ',' in date_string:
+            # Split by comma and parse all dates
+            date_parts = date_string.split(',')
+            parsed_dates = []
+            
+            for part in date_parts:
+                part = part.strip()
+                if part:
+                    # Try to parse this part (without recursion to avoid infinite loop)
+                    for fmt in ["%Y-%m-%d", "%m/%d/%Y", "%m-%d-%Y", "%d/%m/%Y"]:
+                        try:
+                            parsed = datetime.strptime(part, fmt).replace(tzinfo=timezone.utc)
+                            parsed_dates.append(parsed)
+                            break
+                        except ValueError:
+                            continue
+            
+            if parsed_dates:
+                # Return the earliest future date
+                now = datetime.now(timezone.utc)
+                future_dates = [d for d in parsed_dates if d >= now]
+                if future_dates:
+                    return min(future_dates)
+                # If all dates are past, return the most recent one
+                return max(parsed_dates)
+            
+            # If we couldn't parse any part, continue with normal parsing
+            date_string = date_parts[0].strip()
+        
         # Try different date formats
         date_formats = [
             "%Y-%m-%d",
@@ -222,23 +257,28 @@ class FundingOpportunitiesManager:
     
     def _extract_deadline_with_gemini(self, opportunity: Dict[str, Any]) -> Optional[str]:
         """Use Gemini to extract deadline from opportunity description"""
-        try:
-            # Combine all text fields
-            text = f"""
-            Title: {opportunity.get('title', '')}
-            Description: {opportunity.get('description', '')}
-            URL Content: {opportunity.get('url_content', {}).get('text', '')[:1000]}
-            """
-            
-            prompt = """Extract the deadline or close date from this funding opportunity. 
-            Return ONLY the date in format YYYY-MM-DD. 
-            If no deadline is found, return 'NO_DEADLINE'.
-            If the deadline is expressed as 'anytime' or 'continuous', return 'ANYTIME'.
-            
-            Text: {text}
-            """
-            
-            # Use Gemini to extract deadline
+        # Combine all text fields
+        text = f"""
+        Title: {opportunity.get('title', '')}
+        Description: {opportunity.get('description', '')}
+        URL: {opportunity.get('url', '')}
+        URL Content: {opportunity.get('url_content', {}).get('main_content', '')[:2000]}
+        Deadline info from URL: {opportunity.get('url_content', {}).get('deadline_info', '')}
+        """
+        
+        prompt = """Extract the deadline or close date from this funding opportunity. 
+        Look for phrases like "due date", "deadline", "applications due", "proposals due", "closing date", etc.
+        If multiple dates are mentioned, return the next upcoming deadline.
+        
+        Return ONLY the date in format YYYY-MM-DD. 
+        If no deadline is found, return 'NO_DEADLINE'.
+        If the deadline is expressed as 'anytime', 'continuous', 'rolling basis', or 'no deadline', return 'ANYTIME'.
+        
+        Text: {text}
+        """
+        
+        # Define the API call function
+        def make_gemini_call():
             from google import genai
             import os
             client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
@@ -246,16 +286,25 @@ class FundingOpportunitiesManager:
                 model='gemini-2.0-flash-exp',
                 contents=[prompt.format(text=text)]
             )
+            return response
+        
+        # Use rate limiter to execute with retry logic
+        try:
+            response = gemini_rate_limiter.execute_with_retry(make_gemini_call, max_retries=3)
             
-            result = response.text.strip()
-            if result not in ['NO_DEADLINE', 'ANYTIME']:
-                # Try to parse the date
-                parsed_date = self._parse_date(result)
-                if parsed_date:
+            if response:
+                result = response.text.strip()
+                if result not in ['NO_DEADLINE', 'ANYTIME']:
+                    # Try to parse the date
+                    parsed_date = self._parse_date(result)
+                    if parsed_date:
+                        return result
+                else:
                     return result
                     
         except Exception as e:
-            print(f"  ⚠️ Error extracting deadline with Gemini: {e}")
+            if "429" not in str(e) and "RESOURCE_EXHAUSTED" not in str(e):
+                print(f"  ⚠️ Error extracting deadline with Gemini: {str(e)[:100]}")
             
         return None
     
@@ -269,6 +318,13 @@ class FundingOpportunitiesManager:
         # Get current date
         now = datetime.now(timezone.utc)
         
+        # Check if it accepts proposals anytime
+        if opportunity.get('accepts_anytime', False):
+            # Set far future date for continuous opportunities
+            opportunity['close_date'] = 'Continuous'
+            far_future = datetime(2030, 12, 31, tzinfo=timezone.utc)
+            return False, far_future
+        
         # Check various date fields
         date_fields = ['close_date', 'Close Date', 'deadline', 'Deadline', 'Next due date (Y-m-d)']
         
@@ -278,7 +334,21 @@ class FundingOpportunitiesManager:
                 if exp_date:
                     return exp_date < now, exp_date
                     
-        # If no date found in standard fields, try Gemini extraction
+        # If no date found in standard fields, try to get it from URL
+        if opportunity.get('url') and not opportunity.get('url_content'):
+            print(f"  ℹ️ Fetching URL content for deadline extraction: {opportunity.get('title', '')[:50]}...")
+            opportunity = self._enrich_opportunity_with_url(opportunity)
+        
+        # Check if URL content has deadline information
+        url_content = opportunity.get('url_content', {})
+        deadline_from_url = url_content.get('deadline_info', '') or url_content.get('deadline', '')
+        if deadline_from_url:
+            exp_date = self._parse_date(deadline_from_url)
+            if exp_date:
+                opportunity['close_date'] = deadline_from_url
+                return exp_date < now, exp_date
+        
+        # If still no date found, try Gemini extraction as last resort
         gemini_deadline = self._extract_deadline_with_gemini(opportunity)
         if gemini_deadline and gemini_deadline not in ['NO_DEADLINE', 'ANYTIME']:
             # Add the extracted deadline to the opportunity
@@ -697,6 +767,7 @@ class FundingOpportunitiesManager:
                     "program_id": row.get("Program ID", ""),
                     "award_type": row.get("Award Type", ""),
                     "close_date": row.get("Next due date (Y-m-d)", ""),
+                    "Next due date (Y-m-d)": row.get("Next due date (Y-m-d)", ""),  # Keep raw field too
                     "posted_date": row.get("Posted date (Y-m-d)", ""),
                     "url": row.get("URL", ""),
                     "solicitation_url": row.get("Solicitation URL", ""),
@@ -774,8 +845,16 @@ class FundingOpportunitiesManager:
         batch_data = []
         requests_this_minute = 0
         minute_start = time.time()
+        total_opportunities = len(opportunities)
         
-        for opp in opportunities:
+        for idx, opp in enumerate(opportunities, 1):
+            # Send progress update
+            if self.progress_callback:
+                self.progress_callback({
+                    'current': idx,
+                    'total': total_opportunities,
+                    'message': f'Processing opportunity {idx} of {total_opportunities}: {opp.get("title", "")[:50]}...'
+                })
             # Generate unique ID
             opp_id = self._generate_opportunity_id(opp)
             

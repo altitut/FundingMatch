@@ -121,20 +121,55 @@ class URLContentFetcher:
     def _extract_deadline_info(self, soup: BeautifulSoup) -> str:
         """Extract deadline information"""
         deadline_keywords = ['deadline', 'due date', 'close date', 'closing date', 
-                           'submission deadline', 'application deadline']
+                           'submission deadline', 'application deadline', 'proposal due',
+                           'applications due', 'next deadline', 'upcoming deadline']
         
+        # First try to find deadline in specific patterns
         for keyword in deadline_keywords:
-            # Search in text
+            # Look for keyword followed by date
             pattern = re.compile(f'{keyword}[:\s]*([^<\n]+)', re.I)
-            match = pattern.search(str(soup))
-            if match:
-                return match.group(1).strip()[:200]
+            text = soup.get_text()
+            matches = pattern.findall(text)
+            
+            for match in matches:
+                # Look for dates in the matched text
+                # Multiple date formats
+                date_patterns = [
+                    r'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},?\s+\d{4}\b',
+                    r'\b\d{1,2}/\d{1,2}/\d{4}\b',
+                    r'\b\d{4}-\d{2}-\d{2}\b',
+                    r'\b\d{1,2}-\d{1,2}-\d{4}\b'
+                ]
+                
+                for date_pattern in date_patterns:
+                    date_match = re.search(date_pattern, match)
+                    if date_match:
+                        return date_match.group(0)
         
-        # Look for date patterns
+        # If no keyword match, look for standalone dates near deadline-related words
+        deadline_section = None
+        for keyword in deadline_keywords:
+            elements = soup.find_all(text=re.compile(keyword, re.I))
+            for elem in elements:
+                parent = elem.parent
+                if parent:
+                    text = parent.get_text()[:500]
+                    # Look for dates
+                    date_pattern = re.compile(r'\b(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},?\s+\d{4}|\d{1,2}/\d{1,2}/\d{4}|\d{4}-\d{2}-\d{2})\b')
+                    dates = date_pattern.findall(text)
+                    if dates:
+                        return dates[0]  # Return first date found
+        
+        # Fallback: look for any date patterns in the page
         date_pattern = re.compile(r'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},?\s+\d{4}\b')
         dates = date_pattern.findall(soup.get_text())
         if dates:
-            return f"Found dates: {', '.join(dates[:3])}"
+            # Filter out old dates if possible
+            from datetime import datetime
+            current_year = datetime.now().year
+            future_dates = [d for d in dates if str(current_year) in d or str(current_year + 1) in d or str(current_year + 2) in d]
+            if future_dates:
+                return future_dates[0]
         
         return ""
     

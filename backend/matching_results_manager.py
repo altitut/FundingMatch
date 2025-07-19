@@ -193,6 +193,53 @@ class MatchingResultsManager:
         except Exception as e:
             print(f"Error getting recent searches: {e}")
             return []
+    
+    def get_high_confidence_matches_count(self, confidence_threshold: float = 80.0) -> int:
+        """Get count of matches with confidence score above threshold"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                SELECT COUNT(DISTINCT opportunity_id) 
+                FROM funding_matches 
+                WHERE confidence_score >= ?
+            """, (confidence_threshold,))
+            
+            count = cursor.fetchone()[0]
+            
+            conn.close()
+            return count
+            
+        except Exception as e:
+            print(f"Error getting high confidence matches: {e}")
+            return 0
+    
+    def get_high_confidence_matches_details(self, confidence_threshold: float = 80.0, limit: int = 5) -> List[Dict[str, Any]]:
+        """Get details of high confidence matches"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            
+            cursor.execute("""
+                SELECT opportunity_id, title, agency, MAX(confidence_score) as max_score,
+                       COUNT(DISTINCT user_id) as matched_users
+                FROM funding_matches 
+                WHERE confidence_score >= ?
+                GROUP BY opportunity_id
+                ORDER BY max_score DESC, matched_users DESC
+                LIMIT ?
+            """, (confidence_threshold, limit))
+            
+            matches = [dict(row) for row in cursor.fetchall()]
+            
+            conn.close()
+            return matches
+            
+        except Exception as e:
+            print(f"Error getting high confidence match details: {e}")
+            return []
 
 
 if __name__ == "__main__":

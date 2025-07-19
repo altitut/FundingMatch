@@ -178,10 +178,11 @@ class VectorDatabaseManager:
         Returns:
             List of matching opportunities with scores
         """
-        # Query ChromaDB
+        # Query ChromaDB - get more results initially to find better diversity
+        initial_results = min(n_results * 3, 100)  # Get 3x results but cap at 100
         results = self.opportunities.query(
             query_embeddings=[profile_embedding],
-            n_results=n_results,
+            n_results=initial_results,
             where=filter_dict
         )
         
@@ -189,11 +190,25 @@ class VectorDatabaseManager:
         opportunities = []
         for i in range(len(results['ids'][0])):
             opportunity = json.loads(results['documents'][0][i])
-            opportunity['similarity_score'] = 1 - results['distances'][0][i]  # Convert distance to similarity
+            # Convert L2 distance to similarity score
+            # For normalized embeddings, L2 distance ranges from 0 to 2
+            distance = results['distances'][0][i]
+            
+            # More sophisticated scoring that spreads out the scores
+            # Use exponential decay to amplify differences
+            # Scores will range more widely from ~0.3 to ~0.95
+            normalized_distance = distance / 2.0  # Normalize to [0, 1]
+            # Use exponential decay with base 0.5 for better spread
+            opportunity['similarity_score'] = np.exp(-2.0 * normalized_distance)
+            
+            # Also store raw distance for debugging
+            opportunity['raw_distance'] = distance
             opportunity['match_id'] = results['ids'][0][i]
             opportunities.append(opportunity)
-            
-        return opportunities
+        
+        # Sort by similarity score and return top n_results
+        opportunities.sort(key=lambda x: x['similarity_score'], reverse=True)
+        return opportunities[:n_results]
     
     def search_similar_proposals(self, 
                                opportunity_embedding: List[float], 
@@ -224,7 +239,10 @@ class VectorDatabaseManager:
         proposals = []
         for i in range(len(results['ids'][0])):
             proposal = json.loads(results['documents'][0][i])
-            proposal['similarity_score'] = 1 - results['distances'][0][i]
+            # Convert L2 distance to similarity score (same as opportunities)
+            distance = results['distances'][0][i]
+            distance = min(2.0, max(0.0, distance))
+            proposal['similarity_score'] = 1 - (distance / 2.0)
             proposal['match_id'] = results['ids'][0][i]
             proposals.append(proposal)
             

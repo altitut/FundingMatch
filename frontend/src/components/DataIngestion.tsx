@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, CheckCircle, AlertCircle, Database, ExternalLink, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Upload, CheckCircle, AlertCircle, Database, ExternalLink, Calendar, ChevronLeft, ChevronRight, Target } from 'lucide-react';
 import axios from 'axios';
 
 const API_BASE = 'http://localhost:5001/api';
@@ -8,6 +8,14 @@ interface Stats {
   opportunities?: number;
   researchers?: number;
   proposals?: number;
+  high_confidence_matches?: number;
+  top_matches?: Array<{
+    opportunity_id: string;
+    title: string;
+    agency: string;
+    max_score: number;
+    matched_users: number;
+  }>;
 }
 
 interface ProgressInfo {
@@ -244,18 +252,20 @@ const DataIngestion: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex-1">
               <p className="text-sm font-medium text-gray-600">Total Opportunities</p>
               <p className="text-2xl font-bold text-gray-900">{stats.opportunities || 0}</p>
+              <p className="text-xs text-gray-500 mt-1">Active with deadlines</p>
             </div>
             <Database className="h-8 w-8 text-indigo-600" />
           </div>
         </div>
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex-1">
               <p className="text-sm font-medium text-gray-600">Researchers</p>
               <p className="text-2xl font-bold text-gray-900">{stats.researchers || 0}</p>
+              <p className="text-xs text-gray-500 mt-1">Active profiles</p>
             </div>
             <Database className="h-8 w-8 text-green-600" />
           </div>
@@ -263,13 +273,47 @@ const DataIngestion: React.FC = () => {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Proposals</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.proposals || 0}</p>
+              <p className="text-sm font-medium text-gray-600">High-Confidence Matches</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.high_confidence_matches || 0}</p>
+              <p className="text-xs text-gray-500 mt-1">Over 80% confidence</p>
             </div>
-            <Database className="h-8 w-8 text-purple-600" />
+            <Target className="h-8 w-8 text-purple-600" />
           </div>
         </div>
       </div>
+
+      {/* Top High-Confidence Matches */}
+      {stats.top_matches && stats.top_matches.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Top High-Confidence Matches</h3>
+          <div className="space-y-3">
+            {stats.top_matches.map((match, index) => (
+              <div key={match.opportunity_id} className="border-l-4 border-green-500 pl-4 py-2">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h4 className="text-sm font-medium text-gray-900 line-clamp-1">
+                      {match.title}
+                    </h4>
+                    <div className="mt-1 flex items-center space-x-4 text-xs text-gray-600">
+                      <span>{match.agency}</span>
+                      <span className="flex items-center">
+                        <svg className="h-3 w-3 text-green-600 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        {match.max_score.toFixed(1)}% match
+                      </span>
+                      <span>{match.matched_users} researcher{match.matched_users !== 1 ? 's' : ''}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-xs text-gray-500">
+            These opportunities have matched with researchers at over 80% confidence
+          </p>
+        </div>
+      )}
 
       {/* Upload Area */}
       <div className="bg-white rounded-lg shadow">

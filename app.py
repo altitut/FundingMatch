@@ -120,6 +120,14 @@ def get_stats():
             if user_count > db_stats['researchers']:
                 db_stats['researchers'] = user_count
         
+        # Get high-confidence matches count
+        high_confidence_count = matching_results.get_high_confidence_matches_count(80.0)
+        high_confidence_details = matching_results.get_high_confidence_matches_details(80.0, 5)
+        
+        # Add high-confidence matches to stats
+        db_stats['high_confidence_matches'] = high_confidence_count
+        db_stats['top_matches'] = high_confidence_details
+        
         return jsonify({
             'success': True,
             'stats': db_stats
@@ -507,21 +515,64 @@ def process_profile_updates():
         user_id = data.get('user_id')
         new_files = data.get('new_files', [])
         
-        # Re-create profile with all documents
-        json_files = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.endswith('.json')]
-        if not json_files:
-            return jsonify({'success': False, 'error': 'No user profile found'}), 400
+        # Find the correct JSON file for this user
+        json_file = None
+        upload_dir = app.config['UPLOAD_FOLDER']
         
-        json_path = os.path.join(app.config['UPLOAD_FOLDER'], json_files[0])
-        pdf_files = [os.path.join(app.config['UPLOAD_FOLDER'], f) 
-                    for f in os.listdir(app.config['UPLOAD_FOLDER']) if f.endswith('.pdf')]
+        if user_id:
+            # Try to find matching JSON file by checking content
+            json_files = [f for f in os.listdir(upload_dir) if f.endswith('.json')]
+            for jf in json_files:
+                try:
+                    json_path = os.path.join(upload_dir, jf)
+                    with open(json_path, 'r') as f:
+                        json_data = json.load(f)
+                        person = json_data.get('person', {})
+                        name = person.get('name', '')
+                        # Generate ID same way as user_profile_manager
+                        import hashlib
+                        file_user_id = hashlib.md5(name.encode()).hexdigest()
+                        if file_user_id == user_id:
+                            json_file = json_path
+                            break
+                except:
+                    pass
+        
+        if not json_file:
+            # Fallback to first JSON file if user_id not found
+            json_files = [f for f in os.listdir(upload_dir) if f.endswith('.json')]
+            if not json_files:
+                return jsonify({'success': False, 'error': 'No user profile found'}), 400
+            json_file = os.path.join(upload_dir, json_files[0])
+        
+        # Get all PDF files
+        pdf_files = [os.path.join(upload_dir, f) 
+                    for f in os.listdir(upload_dir) if f.endswith('.pdf')]
+        
+        print(f"Reprocessing profile with {len(pdf_files)} PDFs")
         
         # Create updated profile
-        profile = user_manager.create_user_profile(json_path, pdf_files)
+        profile = user_manager.create_user_profile(json_file, pdf_files)
+        
+        # Count documents and URLs
+        documents_processed = len(profile.get('extracted_pdfs', {}))
+        urls_processed = len([url for url in profile.get('urls', []) if url.get('status') == 'processed'])
+        
+        # Store updated profile
         success = user_manager.store_user_profile(profile)
         
-        return jsonify({'success': success})
+        if success:
+            return jsonify({
+                'success': True,
+                'documents_processed': documents_processed,
+                'urls_processed': urls_processed,
+                'message': f'Profile reprocessed successfully with {documents_processed} documents and {urls_processed} URLs'
+            })
+        else:
+            return jsonify({'success': False, 'error': 'Failed to store updated profile'}), 500
+            
     except Exception as e:
+        print(f"Error in process_profile_updates: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
@@ -608,14 +659,28 @@ def update_profile():
         
         # Get all PDF files to process
         pdf_files = []
+        
+        # First, collect all existing PDFs from uploads directory
+        existing_pdfs = []
+        if os.path.exists(upload_dir):
+            for file in os.listdir(upload_dir):
+                if file.endswith('.pdf'):
+                    existing_pdfs.append(os.path.join(upload_dir, file))
+        
+        # Add existing PDFs first
+        pdf_files.extend(existing_pdfs)
+        
+        # Then add any new PDFs from the request
         for file_info in files:
             if file_info.get('type') == 'pdf':
                 filepath = file_info.get('path', '')
                 # Handle both absolute and relative paths
                 if not os.path.isabs(filepath):
                     filepath = os.path.join(os.path.dirname(__file__), filepath)
-                if os.path.exists(filepath):
+                if os.path.exists(filepath) and filepath not in pdf_files:
                     pdf_files.append(filepath)
+        
+        print(f"Processing {len(pdf_files)} total PDFs for profile update")
         
         # Create updated profile with all documents (URLs will be processed from JSON)
         profile = user_manager.create_user_profile(json_file, pdf_files)
@@ -995,10 +1060,27 @@ def match_opportunities():
         
         # Format matches for frontend
         formatted_matches = []
+        
+        # Get min and max scores for normalization
+        scores = [match.get('similarity_score', 0) for match in matches]
+        min_score = min(scores) if scores else 0
+        max_score = max(scores) if scores else 1
+        score_range = max_score - min_score if max_score > min_score else 1
+        
         for match in matches:
-            # Calculate confidence scores (0-100)
+            # Calculate confidence scores with better distribution
             similarity = match.get('similarity_score', 0)
-            confidence = min(100, max(0, similarity * 100))
+            
+            # Normalize score to 0-1 range based on actual min/max
+            if score_range > 0:
+                normalized_score = (similarity - min_score) / score_range
+            else:
+                normalized_score = similarity
+            
+            # Apply non-linear transformation for better spread
+            # This maps [0,1] to approximately [20,95] with most values in [40,85]
+            confidence = 20 + (75 * (normalized_score ** 0.7))
+            confidence = min(95, max(20, confidence))
             
             # Handle keywords - ensure it's always a list
             keywords = match.get('keywords', [])
@@ -1021,7 +1103,8 @@ def match_opportunities():
                 'deadline': match.get('close_date', 'Not specified'),
                 'url': match.get('url', ''),
                 'confidence_score': round(confidence, 1),
-                'similarity_score': round(similarity, 3)
+                'similarity_score': round(similarity, 4),
+                'raw_distance': round(match.get('raw_distance', 0), 4) if 'raw_distance' in match else None
             })
         
         # Sort by confidence score
@@ -1087,6 +1170,42 @@ def explain_opportunity(index):
         return jsonify({
             'success': True,
             'explanation': explanation
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/opportunities/unprocessed', methods=['GET'])
+def get_unprocessed_opportunities():
+    """Get tracking data for unprocessed opportunities"""
+    try:
+        tracking_file = os.path.join('FundingOpportunities', 'unprocessed_tracking.json')
+        
+        if os.path.exists(tracking_file):
+            with open(tracking_file, 'r') as f:
+                tracking_data = json.load(f)
+        else:
+            # Return empty structure if file doesn't exist
+            tracking_data = {
+                "no_deadline": [],
+                "duplicates": [],
+                "errors": [],
+                "expired": [],
+                "statistics": {
+                    "total_no_deadline": 0,
+                    "total_duplicates": 0,
+                    "total_errors": 0,
+                    "total_expired": 0
+                }
+            }
+        
+        return jsonify({
+            'success': True,
+            'data': tracking_data
         })
         
     except Exception as e:
